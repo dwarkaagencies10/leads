@@ -1,0 +1,1728 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Site Leads</title>
+<meta name="description" content="Construction site lead register for the field team">
+<meta name="theme-color" content="#17212B">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Site Leads">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<style>
+/* ======================= TOKENS ======================= */
+:root{
+  --bg:#E6EAED; --surface:#FFFFFF; --surface-2:#F3F5F7; --ink:#17212B; --ink-2:#2B3742;
+  --muted:#5A6672; --line:#D2D9DF; --line-2:#E3E8EC;
+  --hivis:#FFD400; --hivis-ink:#17212B; --hivis-press:#E6BF00;
+  --blue:#1F55C7; --blue-bg:#E4ECFB;
+  --red:#C21F1D; --red-bg:#FCE4E3; --amber:#9A5B00; --amber-bg:#FFF0C7; --green:#1E7338; --green-bg:#DFF3E5;
+  --elec:#B87700; --elec-bg:#FFF2CF; --cement:#4F5B67; --cement-bg:#E5E9EE;
+  --rmc:#0E6E6E; --rmc-bg:#DDF1F0; --bpd:#6B3FA0; --bpd-bg:#EEE6F8;
+  --head:#17212B; --head-ink:#F2F5F7; --head-muted:#9AA7B3;
+  --r:10px; --r-sm:7px;
+  --font:"Barlow", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+  --font-cond:"Barlow Semi Condensed", "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#10161C; --surface:#19222B; --surface-2:#1F2933; --ink:#E7ECF0; --ink-2:#C9D2DA;
+    --muted:#93A1AE; --line:#2C3843; --line-2:#24303A;
+    --blue:#7FA7FF; --blue-bg:#1C2A45;
+    --red:#FF7A75; --red-bg:#3A1C1C; --amber:#FFC14D; --amber-bg:#3A2E12; --green:#6FD38C; --green-bg:#173323;
+    --elec:#FFC14D; --elec-bg:#3A2E12; --cement:#B9C4CE; --cement-bg:#26313B;
+    --rmc:#5ED0C9; --rmc-bg:#133332; --bpd:#C3A2F0; --bpd-bg:#2B2140;
+    --head:#0B1015; --head-ink:#E7ECF0; --head-muted:#8796A3;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10161C; --surface:#19222B; --surface-2:#1F2933; --ink:#E7ECF0; --ink-2:#C9D2DA;
+  --muted:#93A1AE; --line:#2C3843; --line-2:#24303A;
+  --blue:#7FA7FF; --blue-bg:#1C2A45;
+  --red:#FF7A75; --red-bg:#3A1C1C; --amber:#FFC14D; --amber-bg:#3A2E12; --green:#6FD38C; --green-bg:#173323;
+  --elec:#FFC14D; --elec-bg:#3A2E12; --cement:#B9C4CE; --cement-bg:#26313B;
+    --rmc:#5ED0C9; --rmc-bg:#133332; --bpd:#C3A2F0; --bpd-bg:#2B2140;
+  --head:#0B1015; --head-ink:#E7ECF0; --head-muted:#8796A3;
+  color-scheme: dark;
+}
+
+/* ======================= BASE ======================= */
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg); color:var(--ink); font-family:var(--font); font-size:16px; line-height:1.4; -webkit-tap-highlight-color:transparent; min-height:100vh}
+body.locked{overflow:hidden}
+button,input,select,textarea{font:inherit; color:inherit}
+button{cursor:pointer}
+a{color:var(--blue)}
+:focus-visible{outline:3px solid var(--blue); outline-offset:2px}
+.hidden{display:none !important}
+svg.i{width:20px; height:20px; flex:none; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+.sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
+@media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important} }
+
+/* ======================= BUTTONS ======================= */
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:44px; padding:0 16px; border-radius:var(--r-sm); border:1px solid var(--line); background:var(--surface); font-weight:600; text-decoration:none; color:var(--ink); white-space:nowrap}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--hivis); color:var(--hivis-ink); border-color:var(--hivis)}
+.btn.primary:active{background:var(--hivis-press)}
+.btn.primary:disabled{opacity:.55; cursor:wait}
+.btn.ghost{background:transparent; border-color:transparent}
+.btn.danger{color:var(--red)}
+.btn.small{min-height:36px; padding:0 12px; font-size:15px}
+.btn.block{width:100%}
+.icon-btn{display:inline-grid; place-items:center; width:44px; height:44px; border-radius:var(--r-sm); border:0; background:transparent; color:inherit; text-decoration:none}
+.icon-btn:active{background:rgba(127,127,127,.15)}
+.icon-btn.call{color:var(--blue); background:var(--blue-bg); width:40px; height:40px}
+
+/* ======================= HEADER ======================= */
+.top{position:sticky; top:0; z-index:20; background:var(--head); color:var(--head-ink); padding:calc(env(safe-area-inset-top) + 6px) 8px 6px 16px; display:flex; align-items:center; gap:8px}
+.brand{display:flex; align-items:center; gap:10px; flex:1; min-width:0}
+.brand-mark{background:var(--hivis); color:var(--hivis-ink); font-family:var(--font-cond); font-weight:700; font-size:15px; padding:3px 8px; border-radius:4px; letter-spacing:.2px}
+.brand-user{color:var(--head-muted); font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.top .icon-btn{color:var(--head-ink)}
+#btnRefresh.busy svg{animation:sp .8s linear infinite}
+.more-wrap{display:flex; justify-content:center; padding:16px 0 4px}
+.status-dot{width:8px; height:8px; border-radius:50%; background:#4FBF73; display:inline-block; margin-right:6px}
+.status-dot.off{background:#E5A33A}
+
+/* ======================= TOOLBAR ======================= */
+.toolbar{padding:12px 16px 4px; display:grid; gap:10px; max-width:1400px; margin:0 auto}
+.search{position:relative}
+.search svg{position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--muted)}
+.search input{width:100%; height:48px; border-radius:var(--r); border:1px solid var(--line); background:var(--surface); padding:0 40px 0 42px; font-size:16px}
+.search .clear{position:absolute; right:2px; top:2px; color:var(--muted)}
+.tools{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.seg{display:inline-flex; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-sm); padding:3px; gap:2px}
+.seg button{display:inline-flex; align-items:center; gap:6px; border:0; background:transparent; height:36px; padding:0 12px; border-radius:5px; font-weight:600; color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink); color:var(--surface)}
+.select{height:42px; border-radius:var(--r-sm); border:1px solid var(--line); background:var(--surface); padding:0 10px; font-weight:500; max-width:200px}
+.filter-btn{position:relative}
+.count-badge{background:var(--ink); color:var(--surface); border-radius:10px; font-size:12px; min-width:20px; height:20px; display:inline-grid; place-items:center; padding:0 6px}
+.summary{display:flex; gap:8px; flex-wrap:wrap; align-items:center; font-size:15px}
+.summary .total{color:var(--muted); margin-right:4px}
+.chip{display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 12px; border-radius:16px; border:1px solid var(--line); background:var(--surface); font-weight:600; font-size:14px; color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--ink); color:var(--surface); border-color:var(--ink)}
+.chip.red{color:var(--red); background:var(--red-bg); border-color:transparent}
+.chip.amber{color:var(--amber); background:var(--amber-bg); border-color:transparent}
+.chip.red[aria-pressed="true"]{background:var(--red); color:#fff}
+.chip.amber[aria-pressed="true"]{background:var(--amber); color:#fff}
+.banner{margin:8px 16px 0; padding:10px 14px; border-radius:var(--r-sm); background:var(--amber-bg); color:var(--amber); font-size:14px; font-weight:500; max-width:1368px}
+@media (min-width:1400px){ .banner{margin-left:auto; margin-right:auto} }
+
+/* ======================= CARDS ======================= */
+.list-area{padding:8px 16px 120px; max-width:1400px; margin:0 auto}
+.cards{display:grid; gap:12px; align-items:start; grid-template-columns:repeat(auto-fill, minmax(min(100%, 340px), 1fr))}
+.card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:14px 14px 12px; display:flex; flex-direction:column; gap:8px; cursor:pointer; position:relative; min-width:0}
+.card:active{background:var(--surface-2)}
+.card.archived{opacity:.65}
+.card-top{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.plate{font-family:var(--font-cond); font-weight:700; background:var(--hivis); color:var(--hivis-ink); padding:1px 8px; border-radius:4px; font-size:16px; font-variant-numeric:tabular-nums; box-shadow:inset 0 0 0 1.5px rgba(23,33,43,.85)}
+.badge{font-size:13px; font-weight:600; padding:2px 8px; border-radius:4px; background:var(--surface-2); color:var(--muted)}
+.badge.elec{background:var(--elec-bg); color:var(--elec)}
+.badge.cement{background:var(--cement-bg); color:var(--cement)}
+.badge.rmc{background:var(--rmc-bg); color:var(--rmc)}
+.badge.status{font-weight:700}
+.st-open{background:var(--blue-bg) !important; color:var(--blue) !important}
+.st-conv{background:var(--green-bg) !important; color:var(--green) !important}
+.st-not{background:var(--red-bg) !important; color:var(--red) !important}
+.status-bar{display:flex; gap:8px; flex-wrap:wrap}
+.sbtn{display:inline-flex; align-items:center; gap:8px; min-height:40px; padding:0 14px; border-radius:20px; border:1.5px solid var(--line); background:var(--surface); font-weight:600; font-size:15px; color:var(--ink)}
+.sbtn .n{font-variant-numeric:tabular-nums; font-size:13px; min-width:22px; height:22px; border-radius:11px; display:inline-grid; place-items:center; padding:0 6px; background:var(--surface-2); color:var(--muted)}
+.sbtn .dot{width:10px; height:10px; border-radius:50%}
+.sbtn.st-open-b .dot{background:var(--blue)} .sbtn.st-conv-b .dot{background:var(--green)} .sbtn.st-not-b .dot{background:var(--red)}
+.sbtn[aria-pressed="true"].st-open-b{background:var(--blue); border-color:var(--blue); color:var(--surface)}
+.sbtn[aria-pressed="true"].st-conv-b{background:var(--green); border-color:var(--green); color:var(--surface)}
+.sbtn[aria-pressed="true"].st-not-b{background:var(--red); border-color:var(--red); color:var(--surface)}
+.sbtn[aria-pressed="true"] .dot{background:var(--surface)}
+@media (max-width:480px){
+  .status-bar{flex-wrap:nowrap; gap:5px; overflow-x:auto; scrollbar-width:none; margin:0 -12px; padding:0 12px}
+  .status-bar::-webkit-scrollbar{display:none}
+  .sbtn{flex:none; padding:0 8px; gap:5px; font-size:14px; min-height:40px}
+  .sbtn .n{min-width:20px; padding:0 5px}
+  .sbtn .dot{display:none}
+}
+.sbtn[aria-pressed="true"] .n{background:color-mix(in srgb, var(--surface) 25%, transparent); color:var(--surface)}
+.reason{margin:0; font-size:14px; color:var(--red); background:var(--red-bg); border-radius:6px; padding:6px 10px}
+.reason b{font-weight:600}
+.status-row{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:0 0 14px}
+.status-row .lbl{font-size:14px; color:var(--muted); margin-right:2px}
+.opt.st-open[aria-pressed="true"]{background:var(--blue) !important; color:var(--surface) !important; border-color:var(--blue)}
+.opt.st-conv[aria-pressed="true"]{background:var(--green) !important; color:var(--surface) !important; border-color:var(--green)}
+.opt.st-not[aria-pressed="true"]{background:var(--red) !important; color:var(--surface) !important; border-color:var(--red)}
+.opt.st-open,.opt.st-conv,.opt.st-not{background:var(--surface) !important; color:var(--ink) !important}
+.badge.bpd{background:var(--bpd-bg); color:var(--bpd)}
+.badge.arch{background:var(--surface-2); color:var(--muted)}
+.badge.danger{background:var(--red-bg); color:var(--red)}
+.danger-zone{margin-top:20px; padding-top:16px; border-top:1px solid var(--line); display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+.danger-zone .hint{flex-basis:100%; margin:0}
+.title-role{font-family:var(--font); font-size:12px; font-weight:600; color:var(--muted); border:1px solid var(--line); border-radius:4px; padding:1px 6px; flex:none}
+.d-role{display:inline-block; font-size:13px; font-weight:600; color:var(--muted); margin-bottom:2px}
+.fu{margin-left:auto; font-size:13px; font-weight:600; padding:2px 8px; border-radius:4px; background:var(--surface-2); color:var(--muted); white-space:nowrap}
+.fu.overdue{background:var(--red-bg); color:var(--red)}
+.fu.today{background:var(--amber-bg); color:var(--amber)}
+.fu.soon{background:var(--blue-bg); color:var(--blue)}
+.card h3{margin:0; font-family:var(--font-cond); font-size:21px; line-height:1.15; font-weight:700; display:flex; align-items:center; gap:8px}
+.card h3 .t{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis}
+.card h3 .muted{color:var(--muted); font-weight:600}
+.addr{margin:0; color:var(--muted); font-size:15px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+.stage{display:flex; align-items:center; gap:10px; font-size:14px; font-weight:600; flex-wrap:wrap}
+.pips{display:flex; gap:3px}
+.pips i{width:12px; height:8px; border-radius:2px; background:var(--line)}
+.pips i.on{background:var(--ink)}
+.pips.hold i.on{background:var(--amber)}
+.proj{font-family:var(--font-cond); padding:1px 7px; border:1px solid var(--line); border-radius:4px; font-size:14px}
+.contacts{list-style:none; margin:0; padding:0; display:grid; gap:2px; border-top:1px solid var(--line-2); padding-top:6px}
+.contacts li{display:flex; align-items:center; gap:8px; min-height:40px; font-size:15px}
+.contacts .role{color:var(--muted); width:84px; flex:none; font-size:14px}
+.contacts .who{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:500}
+.contacts .tag{font-size:12px; color:var(--muted); border:1px solid var(--line); border-radius:4px; padding:0 5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; max-width:40%; flex-shrink:1}
+.contacts{grid-template-columns:minmax(0,1fr)}
+.contacts li{min-width:0}
+.contacts li > *{min-width:0}
+.card h3 .title-role{margin-left:auto}
+.contacts .call{flex:none}
+@media (max-width:400px){
+  .contacts .role{width:68px; font-size:13px}
+  .list-area, .toolbar{padding-left:12px; padding-right:12px}
+  .card{padding:12px 12px 10px}
+  .kv .r{grid-template-columns:minmax(96px, 36%) 1fr}
+}
+html, body{overflow-x:clip}
+.extra{margin:0; display:grid; grid-template-columns:auto 1fr; gap:2px 10px; font-size:14px}
+.extra dt{color:var(--muted)}
+.extra dd{margin:0; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical}
+.card-foot{display:flex; align-items:center; gap:8px; border-top:1px solid var(--line-2); padding-top:8px; font-size:14px; color:var(--muted)}
+.card-foot .spacer{flex:1}
+.card-foot a.maplink{display:inline-flex; align-items:center; gap:5px; font-weight:600; text-decoration:none; padding:6px 8px; margin-left:-8px; border-radius:6px}
+.thumb{width:44px; height:44px; border-radius:6px; object-fit:cover; background:var(--surface-2); border:1px solid var(--line)}
+
+.empty{text-align:center; padding:60px 20px; color:var(--muted)}
+.empty h2{font-family:var(--font-cond); color:var(--ink); margin:0 0 6px; font-size:24px}
+
+/* ======================= TABLE ======================= */
+.table-wrap{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); overflow:auto; max-height:calc(100vh - 210px)}
+table{border-collapse:separate; border-spacing:0; width:max-content; min-width:100%; font-size:14px}
+th,td{padding:9px 12px; border-bottom:1px solid var(--line-2); text-align:left; vertical-align:top; max-width:260px}
+th{position:sticky; top:0; background:var(--surface-2); z-index:2; font-weight:600; white-space:nowrap; user-select:none}
+th button{all:unset; cursor:pointer; display:inline-flex; gap:4px; align-items:center}
+th button:focus-visible{outline:3px solid var(--blue)}
+th .arrow{color:var(--muted); font-size:12px}
+td.sr, th.sr{position:sticky; left:0; background:var(--surface); z-index:1}
+th.sr{z-index:3; background:var(--surface-2)}
+tbody tr{cursor:pointer}
+tbody tr:hover td{background:var(--surface-2)}
+td .clip{display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+td a{font-weight:600; text-decoration:none}
+
+/* ======================= FAB ======================= */
+.fab{position:fixed; right:16px; bottom:calc(16px + env(safe-area-inset-bottom)); z-index:15; height:56px; padding:0 22px 0 18px; border-radius:28px; border:2px solid var(--hivis-ink); background:var(--hivis); color:var(--hivis-ink); font-family:var(--font-cond); font-weight:700; font-size:19px; display:inline-flex; align-items:center; gap:8px; box-shadow:0 6px 16px rgba(15,23,30,.28)}
+.fab svg.i{width:24px; height:24px; stroke-width:2.6}
+.fab:active{background:var(--hivis-press)}
+@media (max-height:500px){
+  .fab{width:52px; height:52px; padding:0; justify-content:center; font-size:0; gap:0}
+  .fab svg.i{width:26px; height:26px}
+}
+
+/* ======================= LAYERS (screens) ======================= */
+.layer{position:fixed; inset:0; z-index:40; display:flex; justify-content:center; background:rgba(10,15,20,.45); opacity:0; transition:opacity .16s}
+.layer.in{opacity:1}
+.panel{background:var(--bg); width:100%; max-width:760px; height:100%; display:flex; flex-direction:column; transform:translateY(12px); transition:transform .18s}
+.layer.in .panel{transform:none}
+@media (min-width:800px){ .panel{height:calc(100% - 48px); margin-top:24px; border-radius:14px; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,.3)} }
+.panel-head{display:flex; align-items:center; gap:6px; padding:calc(env(safe-area-inset-top) + 6px) 8px 6px; background:var(--head); color:var(--head-ink); min-height:58px}
+.panel-head .icon-btn{color:var(--head-ink)}
+.panel-head h2{flex:1; margin:0; font-family:var(--font-cond); font-size:21px; font-weight:700; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.panel-body{flex:1; overflow:auto; padding:16px 16px 32px; -webkit-overflow-scrolling:touch}
+.panel-foot{display:flex; gap:10px; padding:10px 16px calc(10px + env(safe-area-inset-bottom)); background:var(--surface); border-top:1px solid var(--line)}
+.panel-foot .btn{flex:1}
+.layer.sheet{align-items:flex-end}
+.layer.sheet .panel{height:auto; max-height:88vh; border-radius:16px 16px 0 0; margin:0}
+@media (min-width:800px){ .layer.sheet{align-items:center} .layer.sheet .panel{border-radius:14px; max-width:560px} }
+.sheet .panel-head{background:var(--surface); color:var(--ink); border-bottom:1px solid var(--line)}
+.sheet .panel-head .icon-btn{color:var(--ink)}
+
+/* ======================= FORM ======================= */
+.sec{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); margin-bottom:12px; overflow:hidden}
+.sec-h{width:100%; display:flex; align-items:center; gap:10px; padding:14px 16px; border:0; background:transparent; text-align:left}
+.sec-h h3{margin:0; flex:1; font-family:var(--font-cond); font-size:19px; font-weight:700}
+.sec-h .filled{font-size:13px; color:var(--muted)}
+.sec-h .chev{transition:transform .15s; color:var(--muted)}
+.sec.closed .chev{transform:rotate(-90deg)}
+.sec.closed .sec-b{display:none}
+.sec-b{padding:0 16px 16px; display:grid; gap:14px}
+.fld label.l{display:block; font-weight:600; font-size:15px; margin-bottom:6px}
+.fld .req{color:var(--red)}
+.inp{width:100%; min-height:48px; border:1px solid var(--line); border-radius:var(--r-sm); background:var(--surface); padding:10px 12px; font-size:16px}
+textarea.inp{min-height:84px; resize:vertical}
+.inp:focus{border-color:var(--blue); outline:none; box-shadow:0 0 0 3px var(--blue-bg)}
+.hint{font-size:13px; color:var(--muted); margin-top:6px}
+.hint.warn{color:var(--amber)}
+.hint.err{color:var(--red)}
+.opts{display:flex; flex-wrap:wrap; gap:8px}
+.opt{min-height:40px; padding:0 14px; border-radius:20px; border:1px solid var(--line); background:var(--surface); font-weight:600; font-size:15px}
+.opt[aria-pressed="true"]{background:var(--ink); color:var(--surface); border-color:var(--ink)}
+.row2{display:flex; gap:8px; flex-wrap:wrap}
+.gps-box{border:1px dashed var(--line); border-radius:var(--r-sm); padding:12px; display:grid; gap:10px}
+.gps-val{font-variant-numeric:tabular-nums; font-weight:600}
+.photos{display:grid; grid-template-columns:repeat(auto-fill, minmax(96px,1fr)); gap:8px}
+.ph{position:relative; aspect-ratio:1; border-radius:8px; overflow:hidden; background:var(--surface-2); border:1px solid var(--line)}
+.ph img{width:100%; height:100%; object-fit:cover; display:block}
+.ph .x{position:absolute; top:4px; right:4px; width:30px; height:30px; border-radius:50%; border:0; background:rgba(0,0,0,.6); color:#fff; display:grid; place-items:center}
+.ph .x svg.i{width:16px; height:16px}
+.ph .state{position:absolute; inset:auto 0 0 0; background:rgba(0,0,0,.6); color:#fff; font-size:12px; padding:3px 6px; text-align:center}
+.ph.fail .state{background:var(--red)}
+.add-ph{display:grid; place-items:center; gap:4px; align-content:center; border:2px dashed var(--line); border-radius:8px; aspect-ratio:1; background:transparent; color:var(--ink); font-weight:600; font-size:14px}
+.add-ph svg.i{width:26px; height:26px}
+.draft-note{display:flex; align-items:center; gap:10px; background:var(--blue-bg); color:var(--blue); border-radius:var(--r-sm); padding:10px 12px; margin-bottom:12px; font-size:14px; font-weight:500}
+.draft-note span{flex:1}
+
+/* ======================= DETAIL ======================= */
+.d-top{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px}
+.d-title{font-family:var(--font-cond); font-size:28px; line-height:1.1; margin:0 0 4px}
+.d-addr{color:var(--muted); margin:0 0 12px}
+.actions{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px}
+.tabs{display:flex; gap:4px; border-bottom:1px solid var(--line); margin:0 0 14px}
+.tabs button{border:0; background:transparent; padding:10px 14px; font-weight:600; color:var(--muted); border-bottom:3px solid transparent; margin-bottom:-1px}
+.tabs button[aria-selected="true"]{color:var(--ink); border-color:var(--hivis)}
+.kv{display:grid; gap:0}
+.kv .r{display:grid; grid-template-columns:minmax(110px, 38%) 1fr; gap:10px; padding:10px 0; border-bottom:1px solid var(--line-2); align-items:center}
+.kv .r:last-child{border-bottom:0}
+.kv .k{color:var(--muted); font-size:14px}
+.kv .v{font-weight:500; word-break:break-word; display:flex; align-items:center; gap:8px; flex-wrap:wrap; white-space:pre-wrap}
+.kv .v.none{color:var(--muted); font-weight:400}
+.map{width:100%; height:200px; border:0; border-radius:8px; display:block; margin-top:6px; background:var(--surface-2)}
+.meta{font-size:13px; color:var(--muted); margin:16px 0}
+.hist{list-style:none; margin:0; padding:0}
+.hist li{padding:12px 0; border-bottom:1px solid var(--line-2)}
+.hist .when{font-size:13px; color:var(--muted)}
+.hist .what{margin-top:2px}
+.hist del{color:var(--red); text-decoration:line-through}
+.hist ins{color:var(--green); text-decoration:none; font-weight:600}
+
+/* viewer */
+.viewer{background:rgba(0,0,0,.92); align-items:center; justify-content:center; flex-direction:column}
+.viewer img{max-width:100%; max-height:80vh; object-fit:contain}
+.viewer .vbar{position:absolute; top:calc(env(safe-area-inset-top) + 8px); left:8px; right:8px; display:flex; justify-content:space-between}
+.viewer .icon-btn, .viewer a{color:#fff}
+
+/* ======================= IN-APP CAMERA ======================= */
+.layer.camera{background:#000; opacity:1; transition:none}
+.layer.camera .panel{transform:none; transition:none}
+.layer.camera .panel{background:#000; max-width:none; margin:0; height:100%; border-radius:0; box-shadow:none}
+.layer.camera .panel-body{padding:0; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center}
+.cam-video{width:100%; height:100%; object-fit:contain; background:#000}
+.cam-flash{position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; transition:opacity .25s}
+.cam-flash.on{opacity:.7; transition:none}
+.cam-top{position:absolute; top:calc(env(safe-area-inset-top) + 8px); left:8px; right:8px; display:flex; justify-content:space-between; align-items:center; gap:8px}
+.cam-top .icon-btn{color:#fff; background:rgba(0,0,0,.45); border-radius:50%}
+.cam-top .btn{background:rgba(0,0,0,.45); color:#fff; border-color:rgba(255,255,255,.35)}
+.cam-bar{position:absolute; left:0; right:0; bottom:0; padding:16px 20px calc(20px + env(safe-area-inset-bottom)); display:grid; grid-template-columns:1fr auto 1fr; align-items:center; background:linear-gradient(transparent, rgba(0,0,0,.6))}
+.cam-count{color:#fff; font-weight:600; font-size:15px}
+.cam-done{justify-self:end}
+.shutter{width:74px; height:74px; border-radius:50%; border:5px solid #fff; background:rgba(255,255,255,.25); padding:0}
+.shutter:active{background:#fff; transform:scale(.94)}
+.shutter:disabled{opacity:.4}
+.cam-msg{position:absolute; color:#fff; text-align:center; padding:24px; max-width:320px}
+
+/* ======================= SETTINGS ======================= */
+.f-group h4{font-family:var(--font-cond); font-size:17px; margin:16px 0 6px; color:var(--muted)}
+.f-row{background:var(--surface); border:1px solid var(--line); border-radius:var(--r-sm); margin-bottom:6px}
+.f-main{display:flex; align-items:center; gap:4px; padding:4px 4px 4px 12px; min-height:52px}
+.f-main .nm{flex:1; min-width:0}
+.f-main .nm b{display:block; font-weight:600}
+.f-main .nm small{color:var(--muted)}
+.f-row.off .nm b{color:var(--muted); text-decoration:line-through}
+.f-edit{padding:4px 12px 14px; display:grid; gap:12px; border-top:1px solid var(--line-2)}
+.checks{display:flex; flex-wrap:wrap; gap:8px 16px}
+.checks label{display:flex; align-items:center; gap:8px; min-height:36px}
+.checks input{width:20px; height:20px; accent-color:var(--ink)}
+.card-box{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:16px; margin-bottom:12px}
+.card-box h3{font-family:var(--font-cond); margin:0 0 10px; font-size:19px}
+
+/* ======================= LOGIN ======================= */
+.login{min-height:100vh; display:flex; flex-direction:column}
+.login-top{background:var(--head); color:var(--head-ink); padding:calc(env(safe-area-inset-top) + 48px) 24px 56px}
+.login-top .plate-big{display:inline-block; background:var(--hivis); color:var(--hivis-ink); font-family:var(--font-cond); font-weight:700; font-size:34px; padding:4px 14px; border-radius:6px; box-shadow:inset 0 0 0 3px var(--hivis-ink)}
+.login-top p{color:var(--head-muted); margin:14px 0 0; max-width:30ch}
+.login form{background:var(--surface); margin:-28px 16px 24px; border-radius:14px; padding:20px; display:grid; gap:14px; border:1px solid var(--line); max-width:420px; width:calc(100% - 32px); align-self:center}
+.login .err{color:var(--red); font-weight:500; min-height:1em; margin:0}
+.login .demo{font-size:14px; background:var(--amber-bg); color:var(--amber); padding:10px 12px; border-radius:8px; margin:0}
+
+/* ======================= MENU / TOAST ======================= */
+.menu{position:fixed; z-index:60; top:calc(env(safe-area-inset-top) + 54px); right:8px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); box-shadow:0 12px 30px rgba(0,0,0,.2); min-width:230px; padding:6px}
+.menu button{display:flex; width:100%; align-items:center; gap:12px; border:0; background:transparent; padding:12px; border-radius:7px; text-align:left; font-weight:500}
+.menu button:active,.menu button:hover{background:var(--surface-2)}
+.menu hr{border:0; border-top:1px solid var(--line-2); margin:4px 0}
+#toast{position:fixed; left:50%; bottom:calc(88px + env(safe-area-inset-bottom)); transform:translateX(-50%) translateY(20px); background:var(--ink); color:var(--surface); padding:12px 18px; border-radius:10px; font-weight:500; z-index:100; opacity:0; pointer-events:none; transition:all .2s; max-width:calc(100% - 32px)}
+#toast.show{opacity:1; transform:translateX(-50%)}
+#toast.err{background:var(--red); color:#fff}
+.spin{width:18px; height:18px; border:2.5px solid currentColor; border-right-color:transparent; border-radius:50%; animation:sp .7s linear infinite; display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+.loading{display:flex; align-items:center; gap:10px; justify-content:center; padding:40px; color:var(--muted)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="layers"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script>
+/* The Google script link lives in config.js (one line, easy to change on GitHub).
+   If config.js has no link, the app runs in DEMO mode (data stays on this device). */
+const API_URL = String((window.SITE_LEADS_CONFIG && window.SITE_LEADS_CONFIG.API_URL) || '').trim();
+
+const APP_VERSION = "1.0.2";
+const BACKEND_VERSION = "1.0.1"; // the Code.gs version this app needs (or newer)
+function verLess(a, b) { // true if version a is older than b; a missing version counts as oldest
+  const pa = String(a || '0').split('.').map(Number), pb = String(b).split('.').map(Number);
+  for (let i = 0; i < 3; i++) { if ((pa[i] || 0) !== (pb[i] || 0)) return (pa[i] || 0) < (pb[i] || 0); }
+  return false;
+}
+const DEMO = !API_URL;
+
+/* Special columns the app knows about (it still works if you hide them) */
+const K = {
+  SR: 'Sr. No.', CREATED_AT: 'Created At', CREATED_BY: 'Created By', UPDATED_AT: 'Updated At', UPDATED_BY: 'Updated By', ARCHIVED: 'Archived',
+  TITLE: 'Owner Name', TITLE_PHONE: 'Owner Number', ADDR: 'Site Address', TYPE: 'Lead Type', STATUS: 'Site Status',
+  PROJECT: 'Project', FOLLOW: 'Follow-up Date', DATE: 'Date',
+  CTYPE: 'Contractor Type', BUILDER: 'Builder Name', BUILDER_PHONE: 'Builder Number',
+  LSTATUS: 'Lead Status', REASON: 'Not Converted Reason'
+};
+/* Lead Status: new leads start as the first option (Open).
+   "Not Converted" needs a reason; for other statuses the reason is cleared. */
+const isNotConv = v => /not\s*converted/i.test(String(v || ''));
+function statusOptions() { const f = field(K.LSTATUS); return f && f.options.length ? f.options : ['Open', 'Converted', 'Not Converted']; }
+const leadStatus = l => l[K.LSTATUS] || statusOptions()[0];
+const isOpen = l => leadStatus(l) === statusOptions()[0];
+function statusClass(v) { v = String(v || '').toLowerCase(); return isNotConv(v) ? 'st-not' : /convert/.test(v) ? 'st-conv' : 'st-open'; }
+const statusBadge = l => `<span class="badge status ${statusClass(leadStatus(l))}">${esc(leadStatus(l))}</span>`;
+/* Card name rule:
+   Contractor Type = "With Material"    → show Builder name (and call Builder)
+   Contractor Type = "Without Material" → show Owner name (and call Owner)
+   Not selected → Owner name, or Builder name if there's no owner */
+function leadTitle(l) {
+  const ct = String(l[K.CTYPE] || '').toLowerCase();
+  const owner = { name: l[K.TITLE] || '', phone: l[K.TITLE_PHONE] || '', role: 'Owner', label: K.TITLE };
+  const builder = { name: l[K.BUILDER] || '', phone: l[K.BUILDER_PHONE] || '', role: 'Builder', label: K.BUILDER };
+  if (/without/.test(ct)) return owner;
+  if (/with/.test(ct)) return builder;
+  return owner.name || owner.phone || !(builder.name || builder.phone) ? owner : builder;
+}
+const hasChoices = type => type === 'picklist' || type === 'picklist_custom' || type === 'multiselect';
+const multi = v => String(v || '').split(',').map(s => s.trim()).filter(Boolean);
+const SYSTEM_COLS = [K.SR, K.CREATED_AT, K.CREATED_BY, K.UPDATED_AT, K.UPDATED_BY, K.ARCHIVED];
+const TYPE_NAMES = {
+  text: 'Short text', longtext: 'Long text / notes', phone: 'Phone number', number: 'Number', date: 'Date',
+  picklist: 'Picklist (pick one)', multiselect: 'Multi-select (pick several)', picklist_custom: 'Picklist + add new', gps: 'GPS location', photos: 'Photos'
+};
+const SORTS = {
+  new: { key: K.SR, dir: -1, name: 'Newest first' },
+  old: { key: K.SR, dir: 1, name: 'Oldest first' },
+  follow: { key: K.FOLLOW, dir: 1, name: 'Follow-up date' },
+  updated: { key: K.UPDATED_AT, dir: -1, name: 'Recently updated' },
+  name: { key: '__title', dir: 1, name: 'Name A–Z' }
+};
+
+/* ======================= ICONS ======================= */
+const IC = {
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',
+  x: '<path d="M18 6 6 18M6 6l12 12"/>',
+  back: '<path d="M19 12H5M12 19l-7-7 7-7"/>',
+  grid: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  list: '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+  filter: '<path d="M3 5h18l-7 8v6l-4 2v-8z"/>',
+  phone: '<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/>',
+  chat: '<path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.4A8.4 8.4 0 1 1 21 11.5z"/>',
+  pin: '<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>',
+  nav: '<path d="m3 11 19-9-9 19-2-8z"/>',
+  camera: '<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>',
+  image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/>',
+  edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  more: '<circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>',
+  refresh: '<path d="M21 12a9 9 0 1 1-2.6-6.4L21 8"/><path d="M21 3v5h-5"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+  download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
+  logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
+  trash: '<path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/>',
+  archive: '<rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8M10 12h4"/>',
+  up: '<path d="m18 15-6-6-6 6"/>', down: '<path d="m6 9 6 6 6-6"/>',
+  chev: '<path d="m6 9 6 6 6-6"/>',
+  ext: '<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/>'
+};
+const icon = (n, label) => `<svg class="i" viewBox="0 0 24 24" ${label ? `role="img" aria-label="${label}"` : 'aria-hidden="true"'}>${IC[n]}</svg>`;
+
+/* ======================= HELPERS ======================= */
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const store = {
+  get(k, d = null) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* storage full or blocked */ } },
+  del(k) { try { localStorage.removeItem(k); } catch { } }
+};
+function todayISO(offsetDays = 0) {
+  const d = new Date(Date.now() + offsetDays * 864e5);
+  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+}
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+function fmtDate(v) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(v || '');
+  if (!m) return v || '';
+  const sameYear = m[1] === todayISO().slice(0, 4);
+  return `${+m[3]} ${MONTHS[+m[2] - 1]}${sameYear ? '' : ' ' + m[1]}`;
+}
+function fmtStamp(v) {
+  const m = /^(\d{4}-\d{2}-\d{2})[ T](\d{2}):(\d{2})/.exec(v || '');
+  if (!m) return v || '';
+  let h = +m[2]; const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
+  return `${fmtDate(m[1])}${m[1].slice(0, 4) === todayISO().slice(0, 4) ? ' ' + m[1].slice(0, 4) : ''}, ${h}:${m[3]} ${ap}`;
+}
+function followState(v) {
+  if (!v || !/^\d{4}-\d{2}-\d{2}/.test(v)) return null;
+  const t = todayISO();
+  if (v < t) return 'overdue';
+  if (v === t) return 'today';
+  if (v <= todayISO(7)) return 'soon';
+  return 'later';
+}
+function parseLatLng(v) {
+  const m = /(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)/.exec(v || '');
+  return m ? { lat: +m[1], lng: +m[2] } : null;
+}
+const mapsLink = v => { const p = parseLatLng(v); return p ? `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}` : (/^https?:\/\//.test(v || '') ? v : ''); };
+const navLink = v => { const p = parseLatLng(v); return p ? `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}` : mapsLink(v); };
+const digits = v => String(v || '').replace(/\D/g, '');
+const telLink = v => `tel:${String(v || '').replace(/[^\d+]/g, '')}`;
+function waLink(v) { let d = digits(v); if (d.length === 10) d = '91' + d; return `https://wa.me/${d}`; }
+const photoIds = v => String(v || '').split(',').map(s => s.trim()).filter(Boolean);
+function typeClass(v) {
+  v = String(v || '').toLowerCase();
+  return v.includes('elect') ? 'elec' : v.includes('cement') ? 'cement' : v === 'rmc' ? 'rmc' : v === 'bpd' ? 'bpd' : '';
+}
+const typeBadges = v => multi(v).map(t => `<span class="badge ${typeClass(t)}">${esc(t)}</span>`).join('');
+let toastT;
+function toast(msg, err) {
+  const t = $('#toast'); t.textContent = msg; t.className = 'show' + (err ? ' err' : '');
+  clearTimeout(toastT); toastT = setTimeout(() => t.className = '', err ? 4200 : 2400);
+}
+const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+
+/* ======================= STATE ======================= */
+const S = {
+  auth: store.get('sl_auth'),
+  user: null, fields: [], leads: [], loadedAt: 0, online: true,
+  view: store.get('sl_view') || (innerWidth >= 900 ? 'list' : 'cards'), limit: 60,
+  q: '', sortKey: store.get('sl_sort') || 'new', sort: null,
+  filters: (() => { const st = store.get('sl_status'); return st && st.length ? { 'Lead Status': new Set(st) } : {}; })(),
+  follow: 'all', showArchived: false
+};
+S.sort = SORTS[S.sortKey] || SORTS.new;
+const F_ = () => S.fields.filter(f => f.active);
+const field = label => S.fields.find(f => f.label === label);
+
+/* ======================= API ======================= */
+async function api(action, payload = {}, opts = {}) {
+  if (DEMO) return Demo.call(action, payload, S.auth, opts);
+  let res;
+  try {
+    res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action, auth: S.auth, ...payload }) });
+  } catch {
+    S.online = false; updateStatusDot();
+    throw new Error('No internet connection. Check your mobile data and try again.');
+  }
+  S.online = true; updateStatusDot();
+  let j;
+  try { j = await res.json(); } catch { throw new Error('The server did not answer properly. Check the API link in the setup.'); }
+  if (!j.ok && /^Unknown action/.test(j.error || '')) j.error = 'The Google script is an older version. Admin: update Code.gs (SETUP.md, Part 11).';
+  if (!j.ok) { const e = new Error(j.error || 'Something went wrong.'); e.code = j.code; if (j.code === 'AUTH' && action !== 'login' && !opts.loggingIn) logout(j.error); throw e; }
+  return j.data;
+}
+
+/* ======================= DEMO BACKEND (no server) ======================= */
+const DEFAULT_FIELDS = [
+  ['Date', 'date', 'Lead', '', 0, 1], ['Lead Type', 'multiselect', 'Lead', 'Cement, Electrical, RMC, BPD', 1, 1],
+  ['Lead Status', 'picklist', 'Lead', 'Open, Converted, Not Converted', 1, 1], ['Not Converted Reason', 'longtext', 'Lead', '', 1, 1],
+  ['Site Address', 'longtext', 'Site', '', 1, 1], ['Location', 'gps', 'Site', '', 1, 1], ['Photos', 'photos', 'Site', '', 1, 1],
+  ['Owner Name', 'text', 'Owner', '', 1, 1], ['Owner Number', 'phone', 'Owner', '', 1, 1], ['Owner Office Address', 'text', 'Owner', '', 0, 1],
+  ['Builder Name', 'text', 'Builder', '', 1, 1], ['Builder Number', 'phone', 'Builder', '', 1, 1], ['Builder Office Address', 'text', 'Builder', '', 0, 1], ['Builder Details', 'longtext', 'Builder', '', 0, 1],
+  ['Architect Name', 'text', 'Architect', '', 1, 1], ['Architect Number', 'phone', 'Architect', '', 1, 1], ['Architect Office Address', 'text', 'Architect', '', 0, 1], ['Architect Details', 'longtext', 'Architect', '', 0, 1],
+  ['Contractor Name', 'text', 'Contractor', '', 1, 1], ['Contractor Number', 'phone', 'Contractor', '', 1, 1], ['Contractor Type', 'picklist', 'Contractor', 'With Material, Without Material', 1, 1], ['Contractor Details', 'longtext', 'Contractor', '', 0, 1],
+  ['Electrical Contractor Name', 'text', 'Electrical Contractor', '', 1, 1], ['Electrical Contractor Number', 'phone', 'Electrical Contractor', '', 1, 1], ['Electrical Contractor Details', 'longtext', 'Electrical Contractor', '', 0, 1],
+  ['Project', 'picklist_custom', 'Project', 'G+1, G+2, G+3, G+4, G+5, B+G+3, 2B+G+5', 1, 1],
+  ['Site Status', 'picklist', 'Project', 'Excavation, Foundation, Plinth, Structure, Brickwork, Plastering, Finishing, Completed, On Hold', 1, 1],
+  ['Current Usage', 'text', 'Project', '', 1, 1], ['Vendor', 'picklist_custom', 'Project', 'Shree Traders, Agrawal Cement Depot', 1, 1],
+  ['Follow-up Date', 'date', 'Follow-up', '', 1, 1], ['Remark', 'longtext', 'Follow-up', '', 1, 1]
+].map((r, i) => ({ label: r[0], type: r[1], section: r[2], options: r[3] ? r[3].split(',').map(s => s.trim()) : [], card: !!r[4], list: !!r[5], required: false, order: (i + 1) * 10, active: true }));
+
+const Demo = {
+  db() {
+    let db = store.get('sl_demo4');
+    if (!db) {
+      const now = () => todayISO() + ' 10:30';
+      const mk = (sr, o) => Object.assign({ [K.SR]: String(sr), [K.CREATED_AT]: now(), [K.CREATED_BY]: 'Divyesh', [K.UPDATED_AT]: now(), [K.UPDATED_BY]: 'Divyesh', [K.ARCHIVED]: 'No' }, o);
+      db = {
+        fields: DEFAULT_FIELDS, history: [], photos: {},
+        leads: [
+          mk(1, { 'Date': todayISO(-12), 'Lead Type': 'Cement, RMC', 'Site Address': 'Plot 14, Shankar Nagar, near Ganesh temple, Raipur', 'Location': 'https://maps.google.com/?q=21.249710,81.660530', 'Owner Name': 'Ramesh Agrawal', 'Owner Number': '98271 45210', 'Builder Name': 'Sai Constructions', 'Builder Number': '93011 22004', 'Architect Name': 'Ar. Neha Jain', 'Architect Number': '98260 33115', 'Contractor Name': 'Mahesh Sahu', 'Contractor Number': '70000 41221', 'Contractor Type': 'With Material', 'Electrical Contractor Name': 'Vikas Electricals', 'Electrical Contractor Number': '93000 55120', 'Builder Details': 'Builds 3–4 residential projects a year in Shankar Nagar. Prefers credit terms.', 'Lead Status': 'Open', 'Project': 'G+3', 'Site Status': 'Structure', 'Current Usage': 'UltraTech, about 300 bags/month', 'Vendor': 'Shree Traders', 'Follow-up Date': todayISO(-2), 'Remark': 'Slab casting for 2nd floor next week. Meet contractor at site.' }),
+          mk(2, { 'Date': todayISO(-5), 'Lead Type': 'Electrical, BPD', 'Site Address': 'Telibandha main road, opposite petrol pump', 'Owner Name': 'Sunita Verma', 'Owner Number': '94252 10087', 'Builder Name': 'Verma Builders', 'Builder Number': '98930 77120', 'Contractor Name': 'Imran Khan', 'Contractor Number': '99070 11223', 'Contractor Type': 'Without Material', 'Lead Status': 'Converted', 'Project': '2B+G+5', 'Site Status': 'Foundation', 'Vendor': 'Agrawal Cement Depot', 'Follow-up Date': todayISO(0), 'Remark': 'Wiring tender expected after plinth.' }),
+          mk(3, { 'Date': todayISO(-1), 'Lead Type': 'Cement', 'Site Address': 'Mowa, behind D-Mart, new colony', 'Owner Name': 'Prakash Dewangan', 'Owner Number': '89895 61022', 'Contractor Name': 'Rajesh Yadav', 'Contractor Number': '96172 30455', 'Contractor Type': 'Without Material', 'Lead Status': 'Not Converted', 'Not Converted Reason': 'Owner already tied up with another dealer for the full project.', 'Project': 'G+1', 'Site Status': 'Excavation', 'Follow-up Date': todayISO(5) })
+        ]
+      };
+      db.history = db.leads.map(l => ({ at: l[K.CREATED_AT], sr: l[K.SR], user: 'Divyesh', action: 'Created', field: '', old: '', new: '' }));
+      store.set('sl_demo4', db);
+    }
+    return db;
+  },
+  save(db) { store.set('sl_demo4', db); },
+  async call(action, p, auth, opts = {}) {
+    await new Promise(r => setTimeout(r, 180));
+    const db = this.db();
+    if (!auth || String(auth.name).trim().toLowerCase() !== 'divyesh' || String(auth.pin) !== '1234') {
+      const e = new Error('Wrong name or PIN. In demo mode use Divyesh / 1234.'); e.code = 'AUTH'; if (action !== 'login' && !opts.loggingIn) logout(e.message); throw e;
+    }
+    const user = { name: 'Divyesh', role: 'Admin' };
+    const now = todayISO() + ' ' + new Date().toTimeString().slice(0, 5);
+    const H = (sr, action, field = '', o = '', n = '') => db.history.push({ at: now, sr: String(sr), user: user.name, action, field, old: o, new: n });
+    switch (action) {
+      case 'login': return { user };
+      case 'getAll': return { user, version: BACKEND_VERSION, fields: db.fields, leads: db.leads };
+      case 'saveLead': {
+        { // same Lead Status rules as the Google script
+          const cur = p.sr ? db.leads.find(l => +l[K.SR] === +p.sr) || {} : {};
+          const merged = Object.assign({}, cur, p.changes);
+          if (isNotConv(merged[K.LSTATUS]) && !String(merged[K.REASON] || '').trim()) throw new Error('Please enter the reason why this lead was not converted.');
+        }
+        let lead, isNew = !p.sr;
+        if (isNew) {
+          const sr = db.leads.reduce((m, l) => Math.max(m, +l[K.SR] || 0), db.lastSr || 0) + 1;
+          db.lastSr = sr;
+          lead = { [K.SR]: String(sr), [K.CREATED_AT]: now, [K.CREATED_BY]: user.name, [K.ARCHIVED]: 'No' };
+          db.leads.push(lead); H(sr, 'Created');
+        } else {
+          lead = db.leads.find(l => +l[K.SR] === +p.sr);
+          if (!lead) throw new Error('Lead not found.');
+        }
+        const sr = lead[K.SR]; let fieldsChanged = false;
+        for (const [k, v] of Object.entries(p.changes || {})) {
+          const f = db.fields.find(x => x.label === k); if (!f || f.type === 'photos') continue;
+          const nv = String(v ?? '').trim(), ov = lead[k] || '';
+          if (nv === ov) continue;
+          lead[k] = nv; if (!isNew) H(sr, 'Updated', k, ov, nv);
+          if (f.type === 'picklist_custom' && nv && !f.options.includes(nv)) { f.options.push(nv); fieldsChanged = true; }
+        }
+        for (const [k, ops] of Object.entries(p.photos || {})) {
+          let list = photoIds(lead[k]);
+          const rem = (ops.removed || []).filter(id => list.includes(id));
+          list = list.filter(id => !rem.includes(id));
+          const add = (ops.added || []).filter(id => !list.includes(id));
+          list.push(...add); lead[k] = list.join(',');
+          if (add.length) H(sr, 'Photo added', k, '', add.length + ' photo(s)');
+          if (rem.length) H(sr, 'Photo removed', k, rem.length + ' photo(s)', '');
+        }
+        if (!lead[K.LSTATUS]) { lead[K.LSTATUS] = 'Open'; if (!isNew) H(sr, 'Updated', K.LSTATUS, '', 'Open'); }
+        if (!isNotConv(lead[K.LSTATUS]) && lead[K.REASON]) { if (!isNew) H(sr, 'Updated', K.REASON, lead[K.REASON], ''); lead[K.REASON] = ''; }
+        lead[K.UPDATED_AT] = now; lead[K.UPDATED_BY] = user.name;
+        this.save(db);
+        return { lead, fields: fieldsChanged ? db.fields : null };
+      }
+      case 'archive': {
+        const lead = db.leads.find(l => +l[K.SR] === +p.sr);
+        lead[K.ARCHIVED] = p.archived ? 'Yes' : 'No'; lead[K.UPDATED_AT] = now; lead[K.UPDATED_BY] = user.name;
+        H(p.sr, p.archived ? 'Archived' : 'Restored'); this.save(db); return { lead };
+      }
+      case 'deleteLead': {
+        const i = db.leads.findIndex(l => +l[K.SR] === +p.sr);
+        if (i < 0) throw new Error(`Lead #${p.sr} was not found. It may already be deleted. Please refresh.`);
+        const snap = db.leads[i];
+        db.lastSr = Math.max(db.lastSr || 0, +p.sr);
+        db.leads.splice(i, 1); H(p.sr, 'Deleted', '', JSON.stringify(snap)); this.save(db);
+        return { deleted: String(p.sr) };
+      }
+      case 'uploadPhoto': {
+        const id = 'demo' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        db.photos[id] = await shrinkDataUrl(p.data, 640, .6);
+        this.save(db); return { id };
+      }
+      case 'getPhoto': return { dataUrl: db.photos[p.id] || '' };
+      case 'history': return { history: db.history.filter(h => h.sr === String(p.sr)).reverse() };
+      case 'addField': {
+        const f = p.field, label = String(f.label || '').trim();
+        if (!label) throw new Error('Column name is required.');
+        if (db.fields.some(x => x.label.toLowerCase() === label.toLowerCase()) || SYSTEM_COLS.includes(label)) throw new Error(`A column called "${label}" already exists.`);
+        db.fields.push({ label, type: f.type || 'text', section: f.section || 'Other', options: f.options || [], card: !!f.card, list: f.list !== false, required: !!f.required, order: Math.max(0, ...db.fields.map(x => x.order)) + 10, active: true });
+        H('', 'Column added', label); this.save(db); return { fields: db.fields };
+      }
+      case 'updateField': {
+        const f = db.fields.find(x => x.label === p.label); Object.assign(f, p.patch); this.save(db); return { fields: db.fields };
+      }
+      case 'reorderFields': {
+        p.labels.forEach((l, i) => { const f = db.fields.find(x => x.label === l); if (f) f.order = (i + 1) * 10; });
+        db.fields.sort((a, b) => a.order - b.order); this.save(db); return { fields: db.fields };
+      }
+    }
+    throw new Error('Unknown action');
+  }
+};
+
+/* ======================= PHOTOS ======================= */
+const photoCache = {};
+function photoSrc(id, w = 600) {
+  if (photoCache[id]) return photoCache[id];
+  if (DEMO) { const d = Demo.db().photos[id]; return d || ''; }
+  return `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w${w}`;
+}
+// If Google's thumbnail link fails, load the photo through our own server instead
+document.addEventListener('error', async e => {
+  const img = e.target;
+  if (!(img instanceof HTMLImageElement) || !img.dataset.pid || img.dataset.fb) return;
+  img.dataset.fb = '1';
+  try { const r = await api('getPhoto', { id: img.dataset.pid }); if (r.dataUrl) { photoCache[img.dataset.pid] = r.dataUrl; img.src = r.dataUrl; } } catch { }
+}, true);
+
+function loadImage(src) {
+  return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; });
+}
+async function shrinkDataUrl(src, max, q) {
+  const im = await loadImage(src);
+  const s = Math.min(1, max / Math.max(im.naturalWidth, im.naturalHeight));
+  const c = document.createElement('canvas');
+  c.width = Math.round(im.naturalWidth * s); c.height = Math.round(im.naturalHeight * s);
+  c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', q);
+}
+const PHOTO_MAX = 1280, PHOTO_Q = 0.7; // ~150 KB per photo: uploads about twice as fast
+async function compressFile(file) {
+  // Fast path: decode straight from the file (keeps the photo the right way up)
+  if (window.createImageBitmap) {
+    try {
+      const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
+      const sc = Math.min(1, PHOTO_MAX / Math.max(bmp.width, bmp.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(bmp.width * sc); c.height = Math.round(bmp.height * sc);
+      c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+      bmp.close && bmp.close();
+      const out = c.toDataURL('image/jpeg', PHOTO_Q); c.width = c.height = 0;
+      return out;
+    } catch { /* fall back below */ }
+  }
+  const url = URL.createObjectURL(file);
+  try { return await shrinkDataUrl(url, PHOTO_MAX, PHOTO_Q); } finally { URL.revokeObjectURL(url); }
+}
+
+/* In-app camera: the page never leaves the screen, so Android can't reload it.
+   Take several photos in a row; each one is added to the lead straight away. */
+async function openCamera(onShot, useNative) {
+  if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) { useNative(); return; }
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } } });
+  } catch (e) {
+    if (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) {
+      toast('Camera is blocked for this app. Allow Camera in phone settings, or use "From gallery".', true);
+    } else useNative();
+    return;
+  }
+  let n = 0;
+  const stop = () => stream.getTracks().forEach(t => t.stop());
+  const L = openLayer({
+    cls: 'camera', head: '',
+    body: `<video class="cam-video" playsinline autoplay muted></video><div class="cam-flash"></div>
+      <div class="cam-top"><button class="icon-btn" data-close>${icon('x', 'Close camera')}</button>
+        <button class="btn small" data-native>Use phone camera app</button></div>
+      <div class="cam-bar"><span class="cam-count" aria-live="polite">Tap the button to take a photo</span>
+        <button class="shutter" data-shoot aria-label="Take photo"></button>
+        <button class="btn small primary cam-done" data-close>Done</button></div>`,
+    onClose: stop
+  });
+  wireClose(L);
+  const v = $('video', L.el); v.srcObject = stream;
+  try { await v.play(); } catch { }
+  $('[data-native]', L.el).onclick = () => { closeTop(true); setTimeout(useNative, 60); };
+  $('[data-shoot]', L.el).onclick = () => {
+    if (!v.videoWidth) return;
+    const sc = Math.min(1, PHOTO_MAX / Math.max(v.videoWidth, v.videoHeight));
+    const c = document.createElement('canvas');
+    c.width = Math.round(v.videoWidth * sc); c.height = Math.round(v.videoHeight * sc);
+    c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+    const data = c.toDataURL('image/jpeg', PHOTO_Q); c.width = c.height = 0;
+    n++;
+    $('.cam-count', L.el).textContent = `${n} photo${n > 1 ? 's' : ''} added`;
+    const fl = $('.cam-flash', L.el); fl.classList.add('on'); setTimeout(() => fl.classList.remove('on'), 60);
+    if (navigator.vibrate) try { navigator.vibrate(30); } catch { }
+    onShot(data);
+  };
+}
+
+/* ======================= DATA LOADING ======================= */
+function saveCache() { store.set('sl_cache', { user: S.user, fields: S.fields, leads: S.leads, at: S.loadedAt }); }
+function applyData(d) {
+  S.user = d.user; S.fields = d.fields; S.leads = d.leads; S.loadedAt = Date.now();
+  S.backendVersion = d.version ? 'version ' + d.version : 'an old version';
+  S.backendOld = !DEMO && verLess(d.version, BACKEND_VERSION); // only warn if the script is OLDER than this app needs
+  saveCache();
+}
+let refreshing = null;
+function refresh(quiet) {
+  if (refreshing) return refreshing; // one at a time
+  const btn = $('#btnRefresh'); if (btn) btn.classList.add('busy');
+  refreshing = (async () => {
+    try {
+      applyData(await api('getAll'));
+      renderMain();
+      if (!quiet) toast('Up to date');
+    } catch (e) {
+      if (e.code !== 'AUTH') toast(e.message, true);
+    } finally {
+      refreshing = null;
+      const b = $('#btnRefresh'); if (b) b.classList.remove('busy');
+    }
+  })();
+  return refreshing;
+}
+function upsertLead(lead) {
+  const i = S.leads.findIndex(l => l[K.SR] === lead[K.SR]);
+  if (i >= 0) S.leads[i] = Object.assign({}, S.leads[i], lead); else S.leads.push(lead);
+  saveCache();
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && S.user && Date.now() - S.loadedAt > 60000) refresh(true);
+});
+window.addEventListener('online', () => { S.online = true; updateStatusDot(); });
+window.addEventListener('offline', () => { S.online = false; updateStatusDot(); });
+function updateStatusDot() { const d = $('#dot'); if (d) d.className = 'status-dot' + (S.online && navigator.onLine !== false ? '' : ' off'); }
+
+/* ======================= LOGIN ======================= */
+function renderLogin(msg = '') {
+  $('#app').innerHTML = `
+  <div class="login">
+    <div class="login-top">
+      <span class="plate-big">Site Leads</span>
+      <p>Your team's register of construction sites, contacts and follow-ups.</p>
+    </div>
+    <form id="loginForm" autocomplete="on">
+      ${DEMO ? '<p class="demo">Demo mode: nothing is connected yet, so data stays on this device. Log in as <b>Divyesh</b> with PIN <b>1234</b>.</p>' : ''}
+      <div class="fld"><label class="l" for="ln">Your name</label><input class="inp" id="ln" name="username" autocomplete="username" required value="${esc(store.get('sl_lastname') || '')}"></div>
+      <div class="fld"><label class="l" for="lp">PIN</label><input class="inp" id="lp" name="password" type="password" inputmode="numeric" autocomplete="current-password" required></div>
+      <p class="err" id="lerr">${esc(msg)}</p>
+      <button class="btn primary block" type="submit">Log in</button>
+    </form>
+  </div>`;
+  $('#loginForm').onsubmit = async e => {
+    e.preventDefault();
+    const b = e.submitter || $('#loginForm button'); b.disabled = true; b.innerHTML = '<span class="spin"></span> Logging in';
+    S.auth = { name: $('#ln').value.trim(), pin: $('#lp').value.trim() };
+    try {
+      // One trip: checks the PIN and brings all leads at the same time
+      const d = await api('getAll', {}, { loggingIn: true });
+      store.set('sl_auth', S.auth); store.set('sl_lastname', S.auth.name);
+      applyData(d); renderMain();
+    } catch (err) {
+      S.auth = null; $('#lerr').textContent = err.message; b.disabled = false; b.textContent = 'Log in';
+    }
+  };
+}
+function logout(msg) {
+  S.auth = null; S.user = null; store.del('sl_auth'); store.del('sl_cache');
+  while (layers.length) { const L = layers.pop(); L.el.remove(); }
+  document.body.classList.remove('locked');
+  renderLogin(msg || '');
+}
+
+/* ======================= MAIN SCREEN ======================= */
+function renderMain() {
+  if (!$('#main')) {
+    $('#app').innerHTML = `
+    <div id="main">
+      <header class="top">
+        <div class="brand"><span class="brand-mark">Site Leads</span><span class="brand-user"><span id="dot" class="status-dot"></span><span id="uname"></span></span></div>
+        <button class="icon-btn" id="btnRefresh">${icon('refresh', 'Refresh')}</button>
+        <button class="icon-btn" id="btnMenu" aria-haspopup="true">${icon('more', 'Menu')}</button>
+      </header>
+      ${DEMO ? '<div class="banner">Demo mode: data stays on this device until config.js has your Google script link (see SETUP.md).</div>' : ''}
+      <div class="banner hidden" id="oldBackend"></div>
+      <div class="toolbar">
+        <div class="search">${icon('search')}<label class="sr-only" for="q">Search leads</label>
+          <input id="q" type="search" placeholder="Search name, phone, address, vendor…" autocomplete="off">
+          <button class="icon-btn clear hidden" id="qClear">${icon('x', 'Clear search')}</button></div>
+        <div class="tools">
+          <div class="seg" role="group" aria-label="View">
+            <button data-view="cards">${icon('grid')}Cards</button>
+            <button data-view="list">${icon('list')}List</button>
+          </div>
+          <label class="sr-only" for="sortSel">Sort</label>
+          <select class="select" id="sortSel"></select>
+          <button class="btn small filter-btn" id="btnFilter">${icon('filter')}Filter <span class="count-badge hidden" id="fCount"></span></button>
+        </div>
+        <div class="status-bar" id="statusBar" role="group" aria-label="Show leads by status"></div>
+        <div class="summary" id="summary"></div>
+      </div>
+      <main class="list-area" id="list"></main>
+      <button class="fab" id="fab">${icon('plus')}Add lead</button>
+    </div>`;
+    $('#q').addEventListener('input', debounce(e => { S.q = e.target.value; S.limit = 60; renderList(); }, 120));
+    $('#q').addEventListener('input', e => $('#qClear').classList.toggle('hidden', !e.target.value));
+    $('#qClear').onclick = () => { $('#q').value = ''; S.q = ''; $('#qClear').classList.add('hidden'); renderList(); $('#q').focus(); };
+    $$('.seg button').forEach(b => b.onclick = () => { S.view = b.dataset.view; store.set('sl_view', S.view); renderList(); });
+    $('#sortSel').onchange = e => { if (SORTS[e.target.value]) { S.sortKey = e.target.value; S.sort = SORTS[S.sortKey]; store.set('sl_sort', S.sortKey); renderList(); } };
+    $('#btnFilter').onclick = openFilters;
+    $('#btnRefresh').onclick = () => refresh();
+    $('#btnMenu').onclick = openMenu;
+    $('#fab').onclick = () => openForm(null);
+  }
+  const ob = $('#oldBackend');
+  ob.classList.toggle('hidden', !S.backendOld);
+  if (S.backendOld) ob.innerHTML = `The Google script is running <b>${esc(S.backendVersion)}</b>, but this app needs <b>${BACKEND_VERSION}</b>. Admin: in Apps Script go to Deploy → Manage deployments → ✏️ → Version: <b>New version</b> → Deploy, then tap ↻.`;
+  $('#uname').textContent = S.user ? `${S.user.name}${S.user.role === 'Admin' ? ' (Admin)' : ''}` : '';
+  updateStatusDot();
+  renderList();
+}
+
+function searchText(l) { return Object.values(l).join(' ').toLowerCase() + ' ' + digits(Object.values(l).join(' ')); }
+function visibleLeads() {
+  const words = S.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const out = S.leads.filter(l => {
+    if (!S.showArchived && l[K.ARCHIVED] === 'Yes') return false;
+    for (const [lab, set] of Object.entries(S.filters)) {
+      if (!set.size) continue;
+      const f = field(lab);
+      if (lab === K.LSTATUS) { if (!set.has(leadStatus(l))) return false; }
+      else if (f && f.type === 'multiselect') {
+        const vals = multi(l[lab]);
+        if (!(vals.length ? vals.some(v => set.has(v)) : set.has('(blank)'))) return false;
+      } else if (!set.has(l[lab] || '(blank)')) return false;
+    }
+    if (S.follow !== 'all') {
+      const st = followState(l[K.FOLLOW]);
+      if (S.follow === 'none' ? !!l[K.FOLLOW] : S.follow === 'week' ? !(st === 'today' || st === 'soon') : st !== S.follow) return false;
+    }
+    if (words.length) { const t = searchText(l); if (!words.every(w => t.includes(w))) return false; }
+    return true;
+  });
+  const { key, dir } = S.sort;
+  const get = l => key === '__title' ? leadTitle(l).name : (l[key] || '');
+  out.sort((a, b) => {
+    const x = get(a), y = get(b);
+    if (!x && !y) return (+b[K.SR]) - (+a[K.SR]);
+    if (!x) return 1; if (!y) return -1;
+    const nx = +x, ny = +y;
+    const c = (!isNaN(nx) && !isNaN(ny)) ? nx - ny : String(x).localeCompare(String(y), undefined, { sensitivity: 'base', numeric: true });
+    return c * dir || (+b[K.SR]) - (+a[K.SR]);
+  });
+  return out;
+}
+
+function renderList() {
+  if (!$('#main')) return;
+  $$('.seg button').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === S.view));
+  const isPreset = Object.entries(SORTS).find(([, s]) => s.key === S.sort.key && s.dir === S.sort.dir);
+  $('#sortSel').innerHTML = Object.entries(SORTS).map(([k, s]) => `<option value="${k}" ${isPreset && isPreset[0] === k ? 'selected' : ''}>${s.name}</option>`).join('') +
+    (isPreset ? '' : `<option selected value="">Sorted by ${esc(S.sort.key)}</option>`);
+  const nF = Object.values(S.filters).reduce((n, s) => n + s.size, 0) + (S.follow !== 'all' ? 1 : 0) + (S.showArchived ? 1 : 0);
+  $('#fCount').textContent = nF; $('#fCount').classList.toggle('hidden', !nF);
+
+  const leads = visibleLeads();
+  const active = S.leads.filter(l => l[K.ARCHIVED] !== 'Yes');
+  const openActive = active.filter(isOpen);
+  const over = openActive.filter(l => followState(l[K.FOLLOW]) === 'overdue').length;
+  const today = openActive.filter(l => followState(l[K.FOLLOW]) === 'today').length;
+  renderStatusBar(active);
+  $('#summary').innerHTML = `<span class="total">${leads.length} of ${active.length} lead${active.length === 1 ? '' : 's'}</span>
+    ${over ? `<button class="chip red" data-f="overdue" aria-pressed="${S.follow === 'overdue'}">${over} overdue</button>` : ''}
+    ${today ? `<button class="chip amber" data-f="today" aria-pressed="${S.follow === 'today'}">${today} due today</button>` : ''}
+    ${nF ? '<button class="chip" id="clearAll">Clear filters</button>' : ''}`;
+  $$('#summary [data-f]').forEach(b => b.onclick = () => { S.follow = S.follow === b.dataset.f ? 'all' : b.dataset.f; renderList(); });
+  const ca = $('#clearAll'); if (ca) ca.onclick = clearFilters;
+
+  const el = $('#list');
+  if (!S.leads.length) {
+    el.innerHTML = `<div class="empty"><h2>No leads yet</h2><p>Tap “Add lead” when you visit your first site.</p></div>`; return;
+  }
+  if (!leads.length) {
+    el.innerHTML = `<div class="empty"><h2>No matching leads</h2><p>Try a different search or clear the filters.</p><button class="btn" id="clr2">Clear search and filters</button></div>`;
+    $('#clr2').onclick = () => { $('#q').value = ''; S.q = ''; clearFilters(); }; return;
+  }
+  const shown = leads.slice(0, S.limit);
+  el.innerHTML = (S.view === 'list' ? tableHTML(shown) : `<div class="cards">${shown.map(cardHTML).join('')}</div>`) +
+    (leads.length > shown.length ? `<div class="more-wrap"><button class="btn" id="showMore">Show more (${leads.length - shown.length} more)</button></div>` : '');
+  const sm = $('#showMore', el); if (sm) sm.onclick = () => { S.limit += 60; renderList(); };
+  $$('[data-sr]', el).forEach(c => c.addEventListener('click', e => { if (e.target.closest('a,button')) return; openDetail(c.dataset.sr); }));
+  $$('th button[data-sort]', el).forEach(b => b.onclick = () => {
+    const k = b.dataset.sort; S.sort = { key: k, dir: S.sort.key === k ? -S.sort.dir : 1 }; renderList();
+  });
+}
+function clearFilters() { S.filters = {}; S.follow = 'all'; S.showArchived = false; store.del('sl_status'); renderList(); }
+// Status buttons at the top: tap one or several; none selected = show all
+function renderStatusBar(active) {
+  const bar = $('#statusBar'); if (!bar) return;
+  if (!field(K.LSTATUS) || !field(K.LSTATUS).active) { bar.innerHTML = ''; return; }
+  const sel = S.filters[K.LSTATUS] || new Set();
+  bar.innerHTML = statusOptions().map(o => {
+    const n = active.filter(l => leadStatus(l) === o).length;
+    return `<button class="sbtn ${statusClass(o)}-b" data-st="${esc(o)}" aria-pressed="${sel.has(o)}"><span class="dot"></span>${esc(o)}<span class="n">${n}</span></button>`;
+  }).join('');
+  $$('[data-st]', bar).forEach(b => b.onclick = () => {
+    const set = S.filters[K.LSTATUS] || (S.filters[K.LSTATUS] = new Set());
+    set.has(b.dataset.st) ? set.delete(b.dataset.st) : set.add(b.dataset.st);
+    store.set('sl_status', [...set]);
+    renderList();
+  });
+}
+
+function stageHTML(lead) {
+  const f = field(K.STATUS); const v = lead[K.STATUS];
+  const proj = lead[K.PROJECT] ? `<span class="proj">${esc(lead[K.PROJECT])}</span>` : '';
+  if (!v && !proj) return '';
+  let pips = '';
+  if (f && v) {
+    const steps = f.options.filter(o => !/hold|abandon/i.test(o));
+    const idx = steps.indexOf(v);
+    const hold = /hold|abandon/i.test(v);
+    if (idx >= 0 || hold) pips = `<span class="pips ${hold ? 'hold' : ''}" aria-hidden="true">${steps.map((_, i) => `<i class="${hold || i <= idx ? 'on' : ''}"></i>`).join('')}</span>`;
+  }
+  return `<div class="stage">${pips}${v ? `<span>${esc(v)}</span>` : ''}${proj}</div>`;
+}
+function followChip(lead) {
+  if (!isOpen(lead)) return '';
+  const v = lead[K.FOLLOW]; const st = followState(v); if (!st) return '';
+  const txt = st === 'overdue' ? `Overdue ${fmtDate(v)}` : st === 'today' ? 'Follow up today' : `Follow up ${fmtDate(v)}`;
+  return `<span class="fu ${st}">${txt}</span>`;
+}
+const SPECIAL = [K.TITLE, K.TITLE_PHONE, K.BUILDER, K.BUILDER_PHONE, K.ADDR, K.TYPE, K.STATUS, K.PROJECT, K.FOLLOW, K.LSTATUS, K.REASON];
+const reasonHTML = l => isNotConv(leadStatus(l)) && l[K.REASON] ? `<p class="reason"><b>Not converted:</b> ${esc(l[K.REASON])}</p>` : '';
+function titleHTML(t, tag) {
+  return `<span class="t ${t.name ? '' : 'muted'}">${esc(t.name || t.phone || t.role + ' not added')}</span>`;
+}
+function cardHTML(l) {
+  const fields = F_();
+  const sections = [...new Set(fields.map(f => f.section))];
+  const used = new Set(SPECIAL);
+  const contacts = [];
+  const t = leadTitle(l);
+  const titleSec = (field(t.label) || {}).section;
+  for (const sec of sections) {
+    if (sec === titleSec) continue; // already shown as the card's name
+    const sf = fields.filter(f => f.section === sec);
+    const ph = sf.find(f => f.type === 'phone' && f.card);
+    if (!ph) continue;
+    const nameF = sf.find(f => f.type === 'text' && f.card) || sf.find(f => f.type === 'text');
+    const tags = sf.filter(f => f.card && (f.type === 'picklist' || f.type === 'picklist_custom') && l[f.label]);
+    sf.forEach(f => { if (f === ph || f === nameF || tags.includes(f)) used.add(f.label); });
+    const name = nameF ? l[nameF.label] : '', num = l[ph.label];
+    if (!name && !num) continue;
+    contacts.push(`<li><span class="role">${esc(sec)}</span><span class="who">${esc(name || num)}</span>${tags.map(t => `<span class="tag">${esc(l[t.label])}</span>`).join('')}${num ? `<a class="icon-btn call" href="${telLink(num)}" aria-label="Call ${esc(sec)}">${icon('phone')}</a>` : ''}</li>`);
+  }
+  const gps = fields.find(f => f.type === 'gps' && f.card);
+  const ph = fields.find(f => f.type === 'photos' && f.card);
+  if (gps) used.add(gps.label); if (ph) used.add(ph.label);
+  const extras = fields.filter(f => f.card && !used.has(f.label) && l[f.label] && f.type !== 'gps' && f.type !== 'photos');
+  const pics = ph ? photoIds(l[ph.label]) : [];
+  const loc = gps ? l[gps.label] : '';
+  return `<article class="card ${l[K.ARCHIVED] === 'Yes' ? 'archived' : ''}" data-sr="${esc(l[K.SR])}" tabindex="0">
+    <div class="card-top"><span class="plate">#${esc(l[K.SR])}</span>
+      ${field(K.LSTATUS) && field(K.LSTATUS).active ? statusBadge(l) : ''}
+      ${typeBadges(l[K.TYPE])}
+      ${l[K.ARCHIVED] === 'Yes' ? '<span class="badge arch">Archived</span>' : ''}
+      ${followChip(l)}</div>
+    <h3>${titleHTML(t)}<span class="title-role">${esc(t.role)}</span>${t.phone ? `<a class="icon-btn call" href="${telLink(t.phone)}" aria-label="Call ${esc(t.role.toLowerCase())}">${icon('phone')}</a>` : ''}</h3>
+    ${l[K.ADDR] ? `<p class="addr">${esc(l[K.ADDR])}</p>` : ''}
+    ${stageHTML(l)}
+    ${reasonHTML(l)}
+    ${contacts.length ? `<ul class="contacts">${contacts.join('')}</ul>` : ''}
+    ${extras.length ? `<dl class="extra">${extras.map(f => `<dt>${esc(f.label)}</dt><dd>${esc(f.type === 'date' ? fmtDate(l[f.label]) : l[f.label])}</dd>`).join('')}</dl>` : ''}
+    ${(loc || pics.length) ? `<div class="card-foot">
+      ${loc ? `<a class="maplink" href="${esc(navLink(loc))}" target="_blank" rel="noopener">${icon('nav')}Directions</a>` : ''}
+      <span class="spacer"></span>
+      ${pics.length ? `<span>${pics.length} photo${pics.length > 1 ? 's' : ''}</span><img class="thumb" loading="lazy" alt="" data-pid="${esc(pics[0])}" src="${esc(photoSrc(pics[0], 200))}">` : ''}
+    </div>` : ''}
+  </article>`;
+}
+function cellHTML(f, v) {
+  if (f.label === K.LSTATUS) { v = v || statusOptions()[0]; return `<span class="badge status ${statusClass(v)}">${esc(v)}</span>`; }
+  if (!v) return '';
+  switch (f.type) {
+    case 'phone': return `<a href="${telLink(v)}">${esc(v)}</a>`;
+    case 'gps': return `<a href="${esc(mapsLink(v))}" target="_blank" rel="noopener">Map</a>`;
+    case 'photos': { const n = photoIds(v).length; return n ? `${n} photo${n > 1 ? 's' : ''}` : ''; }
+    case 'multiselect': return `<span style="display:flex;gap:4px;flex-wrap:wrap">${typeBadges(v)}</span>`;
+    case 'date': { const st = followState(v); return f.label === K.FOLLOW && st && st !== 'later' ? `<span class="fu ${st}">${esc(fmtDate(v))}</span>` : esc(fmtDate(v)); }
+    default: return `<span class="clip">${esc(v)}</span>`;
+  }
+}
+function tableHTML(leads) {
+  const cols = F_().filter(f => f.list);
+  const th = (key, label, cls = '') => {
+    const on = S.sort.key === key;
+    return `<th class="${cls}" aria-sort="${on ? (S.sort.dir > 0 ? 'ascending' : 'descending') : 'none'}"><button data-sort="${esc(key)}">${esc(label)}<span class="arrow">${on ? (S.sort.dir > 0 ? '▲' : '▼') : ''}</span></button></th>`;
+  };
+  return `<div class="table-wrap"><table>
+    <thead><tr>${th(K.SR, 'Sr.', 'sr')}${cols.map(f => th(f.label, f.label)).join('')}${th(K.UPDATED_AT, 'Updated')}${th(K.UPDATED_BY, 'By')}</tr></thead>
+    <tbody>${leads.map(l => `<tr data-sr="${esc(l[K.SR])}" tabindex="0">
+      <td class="sr"><span class="plate">${esc(l[K.SR])}</span></td>
+      ${cols.map(f => `<td>${cellHTML(f, l[f.label])}</td>`).join('')}
+      <td>${esc(fmtStamp(l[K.UPDATED_AT]))}</td><td>${esc(l[K.UPDATED_BY] || '')}</td></tr>`).join('')}</tbody>
+  </table></div>`;
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.matches && e.target.matches('[data-sr]')) openDetail(e.target.dataset.sr);
+});
+
+/* ======================= LAYERS (screens over the list) ======================= */
+const layers = [];
+function openLayer({ cls = '', head, body, foot = '', onClose, beforeClose }) {
+  const el = document.createElement('div');
+  el.className = 'layer ' + cls;
+  el.innerHTML = `<div class="panel" role="dialog" aria-modal="true">${head}<div class="panel-body">${body}</div>${foot ? `<div class="panel-foot">${foot}</div>` : ''}</div>`;
+  el.addEventListener('click', e => { if (e.target === el) closeTop(); });
+  $('#layers').appendChild(el);
+  const L = { el, onClose, beforeClose, force: false };
+  layers.push(L);
+  history.pushState({ layer: layers.length }, '');
+  document.body.classList.add('locked');
+  requestAnimationFrame(() => el.classList.add('in'));
+  return L;
+}
+function closeTop(force) { const L = layers[layers.length - 1]; if (!L) return; if (force) L.force = true; history.back(); }
+window.addEventListener('popstate', () => {
+  const L = layers[layers.length - 1]; if (!L) return;
+  if (!L.force && L.beforeClose && !L.beforeClose()) { history.pushState({ layer: layers.length }, ''); return; }
+  layers.pop(); L.el.remove(); if (L.onClose) L.onClose();
+  if (!layers.length) document.body.classList.remove('locked');
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && layers.length) closeTop(); });
+const headBar = (title, left = 'back', right = '') =>
+  `<div class="panel-head"><button class="icon-btn" data-close>${icon(left === 'close' ? 'x' : 'back', left === 'close' ? 'Close' : 'Back')}</button><h2>${title}</h2>${right}</div>`;
+function wireClose(L) { $$('[data-close]', L.el).forEach(b => b.onclick = () => closeTop()); }
+
+/* ======================= MENU ======================= */
+function openMenu() {
+  const old = $('.menu'); if (old) { old.remove(); return; }
+  const m = document.createElement('div'); m.className = 'menu'; m.setAttribute('role', 'menu');
+  m.innerHTML = `
+    <button data-a="export">${icon('download')}Export to Excel (CSV)</button>
+    <button data-a="settings">${icon('gear')}Columns and settings</button>
+    <hr><button data-a="logout">${icon('logout')}Log out</button>`;
+  document.body.appendChild(m);
+  const close = e => { if (!m.contains(e.target) && e.target.closest('#btnMenu') === null) { m.remove(); document.removeEventListener('click', close, true); } };
+  setTimeout(() => document.addEventListener('click', close, true));
+  m.onclick = e => {
+    const a = e.target.closest('button')?.dataset.a; if (!a) return;
+    m.remove(); document.removeEventListener('click', close, true);
+    if (a === 'export') exportCSV();
+    if (a === 'settings') openSettings();
+    if (a === 'logout' && confirm('Log out of Site Leads on this device?')) logout();
+  };
+}
+
+/* ======================= EXPORT ======================= */
+function exportCSV() {
+  const leads = visibleLeads();
+  const fields = F_();
+  const cols = [K.SR, ...fields.map(f => f.label), K.CREATED_AT, K.CREATED_BY, K.UPDATED_AT, K.UPDATED_BY, K.ARCHIVED];
+  const typeOf = Object.fromEntries(fields.map(f => [f.label, f.type]));
+  const cell = (c, v) => {
+    v = v || '';
+    if (typeOf[c] === 'photos') v = DEMO ? `${photoIds(v).length} photo(s)` : photoIds(v).map(id => `https://drive.google.com/file/d/${id}/view`).join(' ');
+    if (typeOf[c] === 'gps') v = mapsLink(v) || v;
+    if (/^[=+\-@]/.test(v)) v = "'" + v;
+    return `"${String(v).replace(/"/g, '""')}"`;
+  };
+  const csv = '﻿' + [cols.map(c => cell('', c)).join(','), ...leads.map(l => cols.map(c => cell(c, l[c])).join(','))].join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  a.download = `site-leads-${todayISO()}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  toast(`Exported ${leads.length} lead${leads.length === 1 ? '' : 's'}`);
+}
+
+/* ======================= FILTERS ======================= */
+function openFilters() {
+  // Lead Status has its own buttons at the top of the list
+  const pick = F_().filter(f => f.label !== K.LSTATUS && (f.type === 'picklist' || f.type === 'picklist_custom' || f.type === 'multiselect'));
+  const valuesFor = f => {
+    const present = new Set(f.type === 'multiselect'
+      ? S.leads.flatMap(l => multi(l[f.label]).length ? multi(l[f.label]) : ['(blank)'])
+      : S.leads.map(l => l[f.label] || '(blank)'));
+    const vals = [...f.options.filter(o => present.has(o)), ...[...present].filter(v => !f.options.includes(v) && v !== '(blank)').sort()];
+    if (present.has('(blank)')) vals.push('(blank)');
+    return vals;
+  };
+  const followOpts = [['all', 'Any'], ['overdue', 'Overdue'], ['today', 'Today'], ['week', 'Next 7 days'], ['none', 'No date set']];
+  const body = `
+    <div class="f-group"><h4>Follow-up</h4><div class="opts">${followOpts.map(([k, n]) => `<button class="opt" data-follow="${k}" aria-pressed="${S.follow === k}">${n}</button>`).join('')}</div></div>
+    ${pick.map(f => {
+      const vals = valuesFor(f); if (!vals.length) return '';
+      const set = S.filters[f.label] || new Set();
+      return `<div class="f-group"><h4>${esc(f.label)}</h4><div class="opts">${vals.map(v => `<button class="opt" data-fl="${esc(f.label)}" data-v="${esc(v)}" aria-pressed="${set.has(v)}">${esc(v === '(blank)' ? 'Not filled' : v)}</button>`).join('')}</div></div>`;
+    }).join('')}
+    <div class="f-group"><h4>Archived leads</h4><div class="checks"><label><input type="checkbox" id="fArch" ${S.showArchived ? 'checked' : ''}> Show archived leads</label></div></div>`;
+  const L = openLayer({
+    cls: 'sheet', head: headBar('Filter leads', 'close'), body,
+    foot: `<button class="btn" id="fClear">Clear all</button><button class="btn primary" id="fDone">Show leads</button>`
+  });
+  wireClose(L);
+  const upd = () => { renderList(); $('#fDone', L.el).textContent = `Show ${visibleLeads().length} leads`; };
+  $$('[data-follow]', L.el).forEach(b => b.onclick = () => { S.follow = b.dataset.follow; $$('[data-follow]', L.el).forEach(x => x.setAttribute('aria-pressed', x === b)); upd(); });
+  $$('[data-fl]', L.el).forEach(b => b.onclick = () => {
+    const s = S.filters[b.dataset.fl] || (S.filters[b.dataset.fl] = new Set());
+    s.has(b.dataset.v) ? s.delete(b.dataset.v) : s.add(b.dataset.v);
+    b.setAttribute('aria-pressed', s.has(b.dataset.v)); upd();
+  });
+  $('#fArch', L.el).onchange = e => { S.showArchived = e.target.checked; upd(); };
+  $('#fClear', L.el).onclick = () => { clearFilters(); $$('.opt', L.el).forEach(b => b.setAttribute('aria-pressed', b.dataset.follow === 'all')); $('#fArch', L.el).checked = false; upd(); };
+  $('#fDone', L.el).onclick = () => closeTop();
+  upd();
+}
+
+/* ======================= DETAIL ======================= */
+function openDetail(sr) {
+  const lead = () => S.leads.find(l => l[K.SR] === String(sr));
+  if (!lead()) return;
+  const L = openLayer({ head: headBar(`Lead #${esc(sr)}`, 'back', `<button class="btn small primary" id="dEdit">${icon('edit')}Edit</button>`), body: '' });
+  L.sr = String(sr); L.tab = 'details';
+  wireClose(L);
+  $('#dEdit', L.el).onclick = () => openForm(sr);
+  L.render = () => renderDetail(L, lead());
+  L.render();
+}
+function renderDetail(L, l) {
+  const body = $('.panel-body', L.el);
+  const fields = F_();
+  const sections = [...new Set(fields.map(f => f.section))];
+  const t = leadTitle(l);
+  const isAdmin = S.user && S.user.role === 'Admin';
+  const gpsF = fields.find(f => f.type === 'gps' && l[f.label]);
+  const archived = l[K.ARCHIVED] === 'Yes';
+  const hasStatus = field(K.LSTATUS) && field(K.LSTATUS).active;
+  $('#dEdit', L.el).classList.toggle('hidden', archived);
+  const valHTML = f => {
+    const v = l[f.label] || '';
+    if (f.type === 'photos') {
+      const ids = photoIds(v);
+      return ids.length ? `<div class="photos" style="width:100%">${ids.map(id => `<button class="ph" data-view="${esc(id)}" aria-label="Open photo"><img loading="lazy" alt="" data-pid="${esc(id)}" src="${esc(photoSrc(id, 400))}"></button>`).join('')}</div>` : '';
+    }
+    if (f.label === K.LSTATUS) return statusBadge(l);
+    if (!v) return '';
+    if (f.type === 'phone') return `<span>${esc(v)}</span><a class="icon-btn call" href="${telLink(v)}" aria-label="Call">${icon('phone')}</a><a class="icon-btn call" href="${esc(waLink(v))}" target="_blank" rel="noopener" aria-label="WhatsApp">${icon('chat')}</a>`;
+    if (f.type === 'gps') {
+      const p = parseLatLng(v);
+      return `<span style="width:100%"><a href="${esc(mapsLink(v))}" target="_blank" rel="noopener">${p ? `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}` : 'Open in Maps'}</a>
+        ${p ? `<iframe class="map" loading="lazy" title="Site location" src="https://maps.google.com/maps?q=${p.lat},${p.lng}&z=17&output=embed"></iframe>` : ''}</span>`;
+    }
+    if (f.type === 'multiselect') return typeBadges(v);
+    if (f.label === K.LSTATUS) return statusBadge(l);
+    if (f.type === 'date') { const st = followState(v); return f.label === K.FOLLOW && st && st !== 'later' ? `<span class="fu ${st}" style="margin:0">${esc(fmtDate(v))}</span>` : esc(fmtDate(v)); }
+    return esc(v);
+  };
+  body.innerHTML = `
+    <div class="d-top"><span class="plate">#${esc(l[K.SR])}</span>
+      ${hasStatus ? statusBadge(l) : ''}
+      ${typeBadges(l[K.TYPE])}
+      ${archived ? '<span class="badge arch">Archived</span>' : ''}${followChip(l)}</div>
+    <span class="d-role">${esc(t.role)}${l[K.CTYPE] ? ' · ' + esc(l[K.CTYPE]) : ''}</span>
+    <h1 class="d-title">${esc(t.name || t.phone || t.role + ' not added')}</h1>
+    ${l[K.ADDR] ? `<p class="d-addr">${esc(l[K.ADDR])}</p>` : ''}
+    ${stageHTML(l)}
+    <div style="margin-top:10px">${reasonHTML(l)}</div>
+    <div class="actions" style="margin-top:12px">
+      ${t.phone ? `<a class="btn" href="${telLink(t.phone)}">${icon('phone')}Call ${esc(t.role.toLowerCase())}</a><a class="btn" href="${esc(waLink(t.phone))}" target="_blank" rel="noopener">${icon('chat')}WhatsApp</a>` : ''}
+      ${gpsF ? `<a class="btn" href="${esc(navLink(l[gpsF.label]))}" target="_blank" rel="noopener">${icon('nav')}Directions</a>` : ''}
+    </div>
+    ${hasStatus && !archived ? `<div class="status-row" role="group" aria-label="Change lead status"><span class="lbl">Status:</span>${statusOptions().map(o => `<button class="opt ${statusClass(o)}" data-setst="${esc(o)}" aria-pressed="${leadStatus(l) === o}">${esc(o)}</button>`).join('')}</div>` : ''}
+    <div class="tabs" role="tablist">
+      <button role="tab" data-tab="details" aria-selected="${L.tab === 'details'}">Details</button>
+      <button role="tab" data-tab="history" aria-selected="${L.tab === 'history'}">Change history</button>
+    </div>
+    <div id="tabBody"></div>`;
+  $$('[data-setst]', body).forEach(b => b.onclick = () => changeStatus(l, b.dataset.setst, L));
+  const details = () => sections.map(sec => {
+    const rows = fields.filter(f => f.section === sec && !(f.label === K.REASON && !isNotConv(leadStatus(l)))).map(f => {
+      const h = valHTML(f);
+      return `<div class="r"><div class="k">${esc(f.label)}</div><div class="v ${h ? '' : 'none'}">${h || 'Not added'}</div></div>`;
+    }).join('');
+    return `<section class="card-box"><h3>${esc(sec)}</h3><div class="kv">${rows}</div></section>`;
+  }).join('') + `
+    <p class="meta">Added by ${esc(l[K.CREATED_BY] || '—')} on ${esc(fmtStamp(l[K.CREATED_AT]))}<br>Last changed by ${esc(l[K.UPDATED_BY] || '—')} on ${esc(fmtStamp(l[K.UPDATED_AT]))}</p>
+    <div class="danger-zone">
+      <button class="btn" id="dArch">${icon('archive')}${archived ? 'Restore this lead' : 'Archive this lead'}</button>
+      ${isAdmin ? `<button class="btn danger" id="dDel">${icon('trash')}Delete permanently</button>` : ''}
+      <p class="hint">${isAdmin ? 'Archive hides the lead and can be undone. Delete removes it from the sheet; a copy is kept in the History tab.' : 'Archive hides the lead and can be undone. Only the admin can delete leads permanently.'}</p>
+    </div>`;
+  const showTab = async () => {
+    const tb = $('#tabBody', body);
+    $$('[data-tab]', body).forEach(b => b.setAttribute('aria-selected', b.dataset.tab === L.tab));
+    if (L.tab === 'details') {
+      tb.innerHTML = details();
+      $$('[data-view]', tb).forEach(b => b.onclick = () => openViewer(b.dataset.view));
+      $('#dArch', tb).onclick = async () => {
+        if (!archived && !confirm('Archive this lead? It will be hidden from the list but nothing is deleted. You can restore it later.')) return;
+        try { const r = await api('archive', { sr: l[K.SR], archived: !archived }); upsertLead(r.lead); renderList(); L.render(); toast(archived ? 'Lead restored' : 'Lead archived'); }
+        catch (e) { toast(e.message, true); }
+      };
+      const del = $('#dDel', tb);
+      if (del) del.onclick = async () => {
+        const nm = t.name ? ` (${t.name})` : '';
+        if (!confirm(`Delete lead #${l[K.SR]}${nm} permanently?\n\nIt will be removed from the list and the Google Sheet for everyone. This cannot be undone from the app.`)) return;
+        del.disabled = true; del.innerHTML = '<span class="spin"></span> Deleting';
+        try {
+          await api('deleteLead', { sr: l[K.SR] });
+          S.leads = S.leads.filter(x => x[K.SR] !== l[K.SR]); saveCache();
+          closeTop(true); renderList(); toast(`Lead #${l[K.SR]} deleted`);
+        } catch (e) { toast(e.message, true); del.disabled = false; del.innerHTML = icon('trash') + 'Delete permanently'; }
+      };
+    } else {
+      tb.innerHTML = '<div class="loading"><span class="spin"></span> Loading history</div>';
+      try {
+        const { history } = await api('history', { sr: l[K.SR] });
+        if (L.tab !== 'history') return;
+        tb.innerHTML = history.length ? `<ul class="hist">${history.map(h => `<li><div class="when">${esc(fmtStamp(h.at))}, by ${esc(h.user)}</div><div class="what">${histText(h)}</div></li>`).join('')}</ul>` : '<p class="empty">No changes recorded yet.</p>';
+      } catch (e) { tb.innerHTML = `<p class="hint err">${esc(e.message)}</p>`; }
+    }
+  };
+  $$('[data-tab]', body).forEach(b => b.onclick = () => { L.tab = b.dataset.tab; showTab(); });
+  showTab();
+}
+// Quick status change from the lead screen. "Not Converted" asks for the reason first.
+async function changeStatus(l, to, L) {
+  if (leadStatus(l) === to) return;
+  const save = async (reason, btn) => {
+    const changes = { [K.LSTATUS]: to };
+    if (isNotConv(to)) changes[K.REASON] = reason;
+    try {
+      if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Saving'; }
+      const r = await api('saveLead', { sr: l[K.SR], changes });
+      upsertLead(r.lead); renderList();
+      layers.forEach(x => x.render && x.sr === r.lead[K.SR] && x.render());
+      toast(`Lead #${r.lead[K.SR]} marked ${to}`);
+      return true;
+    } catch (e) { toast(e.message, true); if (btn) { btn.disabled = false; btn.textContent = 'Save'; } return false; }
+  };
+  if (!isNotConv(to)) {
+    if (isNotConv(leadStatus(l)) && l[K.REASON] && !confirm(`Mark as ${to}? The "not converted" reason will be cleared (it stays in the change history).`)) return;
+    return save('');
+  }
+  const S2 = openLayer({
+    cls: 'sheet', head: headBar(`Not converted: lead #${esc(l[K.SR])}`, 'close'),
+    body: `<div class="fld"><label class="l" for="ncr">Why was it not converted? <span class="req">*</span></label>
+      <textarea class="inp" id="ncr" rows="4" placeholder="e.g. Price too high, already buying from another dealer, project on hold…">${esc(l[K.REASON] || '')}</textarea>
+      <div class="hint err" id="ncrErr" aria-live="polite"></div></div>`,
+    foot: `<button class="btn" data-close>Cancel</button><button class="btn primary" id="ncrSave">Save</button>`
+  });
+  wireClose(S2);
+  setTimeout(() => $('#ncr', S2.el).focus(), 200);
+  $('#ncrSave', S2.el).onclick = async e => {
+    const reason = $('#ncr', S2.el).value.trim();
+    if (!reason) { $('#ncrErr', S2.el).textContent = 'The reason is required.'; $('#ncr', S2.el).focus(); return; }
+    if (await save(reason, e.currentTarget)) closeTop(true);
+  };
+}
+function histText(h) {
+  const v = (s, tag) => s ? `<${tag}>${esc(s)}</${tag}>` : '<i>empty</i>';
+  switch (h.action) {
+    case 'Created': return '<b>Lead created</b>';
+    case 'Updated': return `<b>${esc(h.field)}</b> changed from ${v(h.old, 'del')} to ${v(h.new, 'ins')}`;
+    case 'Photo added': return `<b>${esc(h.new)}</b> added`;
+    case 'Photo removed': return `<b>${esc(h.old)}</b> removed`;
+    case 'Archived': return '<b>Lead archived</b>';
+    case 'Restored': return '<b>Lead restored</b>';
+    case 'Deleted': return '<b>Lead deleted</b>';
+    default: return esc(h.action + (h.field ? ': ' + h.field : ''));
+  }
+}
+function openViewer(id) {
+  const L = openLayer({
+    cls: 'viewer',
+    head: `<div class="vbar"><button class="icon-btn" data-close>${icon('x', 'Close')}</button>${DEMO ? '' : `<a class="icon-btn" href="https://drive.google.com/file/d/${esc(id)}/view" target="_blank" rel="noopener">${icon('ext', 'Open in Google Drive')}</a>`}</div>`,
+    body: `<img alt="Site photo" data-pid="${esc(id)}" src="${esc(photoSrc(id, 1600))}">`
+  });
+  const p = $('.panel', L.el); p.style.cssText = 'background:transparent;box-shadow:none;align-items:center;justify-content:center';
+  $('.panel-body', L.el).style.cssText = 'display:grid;place-items:center;flex:1;width:100%';
+  wireClose(L);
+}
+
+/* ======================= ADD / EDIT FORM ======================= */
+function openForm(sr, resume) {
+  const isNew = !sr;
+  const orig = isNew ? {} : Object.assign({}, S.leads.find(l => l[K.SR] === String(sr)));
+  const fields = F_();
+  const st = { vals: {}, photos: {}, pending: 0, saving: false };
+  fields.forEach(f => {
+    st.vals[f.label] = orig[f.label] || '';
+    if (f.type === 'photos') st.photos[f.label] = { list: photoIds(orig[f.label]), added: [], removed: [] };
+  });
+  let draftRestored = false;
+  if (resume && resume.vals) { // the page reloaded while this form was open
+    Object.assign(st.vals, resume.vals);
+    for (const k in resume.photos || {}) if (st.photos[k]) st.photos[k] = resume.photos[k];
+    draftRestored = 'reload';
+  } else if (isNew) {
+    const dr = store.get('sl_draft');
+    if (dr && (Object.values(dr.vals || {}).some(Boolean) || Object.values(dr.photos || {}).some(p => p.added.length))) {
+      Object.assign(st.vals, dr.vals); for (const k in dr.photos) if (st.photos[k]) st.photos[k] = dr.photos[k];
+      draftRestored = true;
+    } else {
+      const df = field(K.DATE); if (df && df.active) st.vals[K.DATE] = todayISO();
+    }
+  }
+  // Lead Status always has a value: new (and old blank) leads start as Open
+  if (field(K.LSTATUS) && field(K.LSTATUS).active && !st.vals[K.LSTATUS]) st.vals[K.LSTATUS] = statusOptions()[0];
+  const saveDraft = () => {
+    if (isNew) store.set('sl_draft', { vals: st.vals, photos: st.photos });
+    store.set('sl_open_form', { sr: isNew ? null : String(sr), vals: st.vals, photos: st.photos, at: Date.now() });
+  };
+  const initial = Object.assign({}, st.vals); // what the form opened with (incl. today's date)
+  const dirty = () => draftRestored || fields.some(f => f.type !== 'photos' && (st.vals[f.label] || '') !== (initial[f.label] || '')) || Object.values(st.photos).some(p => p.added.length || p.removed.length);
+
+  const sections = [...new Set(fields.map(f => f.section))];
+  const body = `
+    ${draftRestored ? `<div class="draft-note"><span>${draftRestored === 'reload' ? 'The page reloaded, so we restored what you had entered.' : "We kept the lead you didn't finish last time."}</span><button class="btn small" id="discardDraft">Start fresh</button></div>` : ''}
+    ${sections.map(sec => `
+      <section class="sec" data-sec="${esc(sec)}">
+        <button class="sec-h" type="button" aria-expanded="true"><h3>${esc(sec)}</h3><span class="filled"></span><span class="chev">${icon('chev')}</span></button>
+        <div class="sec-b">${fields.filter(f => f.section === sec).map(f => fieldHTML(f, st)).join('')}</div>
+      </section>`).join('')}`;
+  const L = openLayer({
+    head: headBar(isNew ? 'New lead' : `Edit lead #${esc(sr)}`, 'close'),
+    body,
+    foot: `<button class="btn" data-close>Cancel</button><button class="btn primary" id="fSave">Save lead</button>`,
+    onClose: () => store.del('sl_open_form'),
+    beforeClose: () => {
+      if (!dirty() || st.saving) return true;
+      if (isNew) return confirm('Close this form? Your entries are kept as an unfinished lead on this phone, so you can continue later.');
+      return confirm('Discard your changes to this lead?');
+    }
+  });
+  wireClose(L);
+  const root = L.el;
+
+  // The reason box only shows (and is required) when the status is Not Converted
+  function toggleReason(focus) {
+    const box = $('[data-reason]', root); if (!box) return;
+    const show = isNotConv(st.vals[K.LSTATUS]);
+    box.classList.toggle('hidden', !show);
+    if (show && focus) setTimeout(() => $('textarea', box).focus(), 50);
+  }
+  toggleReason(false);
+  const secCount = () => $$('.sec', root).forEach(s => {
+    const fs = fields.filter(f => f.section === s.dataset.sec);
+    const n = fs.filter(f => f.type === 'photos' ? st.photos[f.label].list.length : st.vals[f.label]).length;
+    $('.filled', s).textContent = `${n} of ${fs.length} filled`;
+  });
+  $$('.sec-h', root).forEach(h => h.onclick = () => { const s = h.parentElement; s.classList.toggle('closed'); h.setAttribute('aria-expanded', !s.classList.contains('closed')); });
+  const changed = () => { saveDraft(); secCount(); };
+
+  // inputs
+  $$('[data-in]', root).forEach(inp => inp.addEventListener('input', () => { st.vals[inp.dataset.in] = inp.value; changed(); }));
+  // phone duplicate check
+  $$('input[type=tel][data-in]', root).forEach(inp => inp.addEventListener('blur', () => {
+    const d = digits(inp.value).slice(-10), hint = $(`[data-dup="${CSS.escape(inp.dataset.in)}"]`, root);
+    if (!hint) return;
+    if (d.length < 10) { hint.textContent = ''; return; }
+    const hit = S.leads.find(l => l[K.SR] !== orig[K.SR] && fields.some(f => f.type === 'phone' && digits(l[f.label]).slice(-10) === d));
+    hint.textContent = hit ? `This number is already in lead #${hit[K.SR]}${hit[K.TITLE] ? ' (' + hit[K.TITLE] + ')' : ''}.` : '';
+  }));
+  // picklist chips
+  $$('.opts[data-pick]', root).forEach(box => box.addEventListener('click', e => {
+    const b = e.target.closest('.opt'); if (!b) return;
+    const lab = box.dataset.pick, v = b.dataset.v;
+    if (lab === K.LSTATUS && st.vals[lab] === v) return; // status can't be left empty
+    st.vals[lab] = st.vals[lab] === v ? '' : v;
+    if (lab === K.LSTATUS) toggleReason(true);
+    $$('.opt', box).forEach(x => x.setAttribute('aria-pressed', x.dataset.v === st.vals[lab]));
+    changed();
+  }));
+  // multi-select chips: tap to add or remove; saved as "Cement, RMC" in the option order
+  $$('.opts[data-multi]', root).forEach(box => box.addEventListener('click', e => {
+    const b = e.target.closest('.opt'); if (!b) return;
+    const on = b.getAttribute('aria-pressed') !== 'true';
+    b.setAttribute('aria-pressed', on); b.textContent = (on ? '✓ ' : '') + b.dataset.v;
+    st.vals[box.dataset.multi] = $$('.opt', box).filter(x => x.getAttribute('aria-pressed') === 'true').map(x => x.dataset.v).join(', ');
+    changed();
+  }));
+  // picklist + custom
+  $$('select[data-pc]', root).forEach(sel => sel.addEventListener('change', () => {
+    const lab = sel.dataset.pc, other = $(`[data-pcnew="${CSS.escape(lab)}"]`, root);
+    if (sel.value === '__new') { other.classList.remove('hidden'); other.value = ''; st.vals[lab] = ''; other.focus(); }
+    else { other.classList.add('hidden'); st.vals[lab] = sel.value; }
+    changed();
+  }));
+  $$('[data-pcnew]', root).forEach(inp => inp.addEventListener('input', () => { st.vals[inp.dataset.pcnew] = inp.value.trim(); changed(); }));
+  // GPS
+  $$('[data-gps]', root).forEach(box => wireGPS(box, st, changed));
+  // photos
+  $$('[data-photos]', root).forEach(box => wirePhotos(box, st, changed, root));
+
+  if (draftRestored) $('#discardDraft', root).onclick = () => { if (isNew) store.del('sl_draft'); L.force = true; history.back(); setTimeout(() => openForm(isNew ? null : sr), 50); };
+
+  $('#fSave', root).onclick = async () => {
+    if (st.pending) { toast('Wait for the photos to finish uploading'); return; }
+    if (field(K.LSTATUS)) {
+      if (isNotConv(st.vals[K.LSTATUS])) {
+        if (!String(st.vals[K.REASON] || '').trim()) {
+          const box = $('[data-reason]', root);
+          if (box) { box.closest('.sec').classList.remove('closed'); $('[data-reason-err]', box).textContent = 'The reason is required when a lead is Not Converted.'; box.scrollIntoView({ block: 'center' }); $('textarea', box).focus(); }
+          toast('Please enter why this lead was not converted', true); return;
+        }
+      } else if (st.vals[K.REASON]) st.vals[K.REASON] = '';
+    }
+    const missing = fields.filter(f => f.required && !(f.type === 'photos' ? st.photos[f.label].list.length : String(st.vals[f.label] || '').trim()));
+    if (missing.length) { toast(`Please fill: ${missing.map(f => f.label).join(', ')}`, true); return; }
+    const changes = {};
+    fields.forEach(f => { if (f.type !== 'photos' && (st.vals[f.label] || '') !== (orig[f.label] || '')) changes[f.label] = st.vals[f.label]; });
+    const photos = {};
+    for (const [k, p] of Object.entries(st.photos)) if (p.added.length || p.removed.length) photos[k] = { added: p.added, removed: p.removed };
+    if (isNew && !Object.values(changes).some(v => String(v).trim()) && !Object.keys(photos).length) { toast('Enter at least one detail before saving', true); return; }
+    if (!isNew && !Object.keys(changes).length && !Object.keys(photos).length) { closeTop(true); return; }
+    const b = $('#fSave', root); b.disabled = true; b.innerHTML = '<span class="spin"></span> Saving'; st.saving = true;
+    try {
+      const r = await api('saveLead', { sr: isNew ? null : sr, changes, photos });
+      upsertLead(r.lead); if (r.fields) S.fields = r.fields; saveCache();
+      if (isNew) store.del('sl_draft');
+      closeTop(true); renderList();
+      layers.forEach(x => x.render && x.sr === r.lead[K.SR] && x.render());
+      toast(isNew ? `Lead #${r.lead[K.SR]} saved` : 'Changes saved');
+    } catch (e) {
+      st.saving = false; b.disabled = false; b.textContent = 'Save lead'; toast(e.message, true);
+    }
+  };
+  secCount();
+}
+
+function fieldHTML(f, st) {
+  const id = 'f_' + Math.random().toString(36).slice(2, 8);
+  const v = st.vals[f.label] || '';
+  const lab = `<label class="l" for="${id}">${esc(f.label)}${f.required ? ' <span class="req">*</span>' : ''}</label>`;
+  const L = esc(f.label);
+  switch (f.type) {
+    case 'longtext':
+      if (f.label === K.REASON) return `<div class="fld" data-reason><label class="l" for="${id}">Why not converted? <span class="req">*</span></label><textarea class="inp" id="${id}" data-in="${L}" rows="3" placeholder="e.g. Price too high, buying from another dealer, project on hold…">${esc(v)}</textarea><div class="hint err" data-reason-err aria-live="polite"></div></div>`;
+      return `<div class="fld">${lab}<textarea class="inp" id="${id}" data-in="${L}" rows="3">${esc(v)}</textarea></div>`;
+    case 'phone': return `<div class="fld">${lab}<input class="inp" id="${id}" type="tel" inputmode="tel" autocomplete="off" data-in="${L}" value="${esc(v)}" placeholder="10-digit mobile number"><div class="hint warn" data-dup="${L}" aria-live="polite"></div></div>`;
+    case 'number': return `<div class="fld">${lab}<input class="inp" id="${id}" inputmode="decimal" data-in="${L}" value="${esc(v)}"></div>`;
+    case 'date': return `<div class="fld">${lab}<input class="inp" id="${id}" type="date" data-in="${L}" value="${esc(v)}"></div>`;
+    case 'multiselect': {
+      const cur = multi(v);
+      const opts = [...f.options, ...cur.filter(o => !f.options.includes(o))];
+      return `<div class="fld"><span class="l" style="display:block;font-weight:600;margin-bottom:6px">${esc(f.label)}${f.required ? ' <span class="req">*</span>' : ''} <small style="font-weight:400;color:var(--muted)">(tap all that apply)</small></span>
+        <div class="opts" data-multi="${L}" role="group" aria-label="${L}">${opts.map(o => `<button type="button" class="opt" data-v="${esc(o)}" aria-pressed="${cur.includes(o)}">${cur.includes(o) ? '✓ ' : ''}${esc(o)}</button>`).join('')}</div></div>`;
+    }
+    case 'picklist': {
+      const opts = f.options.includes(v) || !v ? f.options : [...f.options, v];
+      return `<div class="fld"><span class="l" style="display:block;font-weight:600;margin-bottom:6px">${esc(f.label)}${f.required ? ' <span class="req">*</span>' : ''}</span>
+        <div class="opts" data-pick="${L}" role="group" aria-label="${L}">${opts.map(o => `<button type="button" class="opt ${f.label === K.LSTATUS ? statusClass(o) : ''}" data-v="${esc(o)}" aria-pressed="${o === v}">${esc(o)}</button>`).join('')}</div></div>`;
+    }
+    case 'picklist_custom': {
+      const opts = f.options.includes(v) || !v ? f.options : [...f.options, v];
+      return `<div class="fld">${lab}<select class="inp" id="${id}" data-pc="${L}">
+          <option value="">Choose…</option>${opts.map(o => `<option ${o === v ? 'selected' : ''}>${esc(o)}</option>`).join('')}
+          <option value="__new">＋ Add new…</option></select>
+        <input class="inp hidden" style="margin-top:8px" data-pcnew="${L}" placeholder="Type the new ${esc(f.label.toLowerCase())}"></div>`;
+    }
+    case 'gps': return `<div class="fld"><span class="l" style="display:block;font-weight:600;margin-bottom:6px">${esc(f.label)}</span><div class="gps-box" data-gps="${L}"></div></div>`;
+    case 'photos': return `<div class="fld"><span class="l" style="display:block;font-weight:600;margin-bottom:6px">${esc(f.label)}</span><div data-photos="${L}"></div></div>`;
+    default: return `<div class="fld">${lab}<input class="inp" id="${id}" data-in="${L}" value="${esc(v)}" autocomplete="off"></div>`;
+  }
+}
+
+function wireGPS(box, st, changed) {
+  const lab = box.dataset.gps;
+  let acc = null;
+  const draw = () => {
+    const v = st.vals[lab] || ''; const p = parseLatLng(v);
+    box.innerHTML = `
+      ${v ? `<div><div class="gps-val">${p ? `${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}` : esc(v)}</div>
+        ${acc != null ? `<div class="hint ${acc > 50 ? 'warn' : ''}">Accurate to about ${Math.round(acc)} m${acc > 50 ? '. Step outside or wait a moment and capture again for a better fix.' : ''}</div>` : ''}</div>` : '<div class="hint" style="margin:0">Stand at the site and capture its location.</div>'}
+      <div class="row2">
+        <button type="button" class="btn ${v ? '' : 'primary'}" data-cap>${icon('pin')}${v ? 'Capture again' : 'Capture location'}</button>
+        ${v ? `<a class="btn" href="${esc(mapsLink(v))}" target="_blank" rel="noopener">${icon('ext')}Open in Maps</a><button type="button" class="btn ghost danger" data-clr>Remove</button>` : ''}
+      </div>
+      <details><summary class="hint" style="cursor:pointer">Or paste a Google Maps link</summary>
+        <input class="inp" style="margin-top:8px" data-paste placeholder="https://maps.google.com/…" value="${p ? '' : esc(v)}"></details>`;
+    $('[data-cap]', box).onclick = capture;
+    const c = $('[data-clr]', box); if (c) c.onclick = () => { st.vals[lab] = ''; acc = null; changed(); draw(); };
+    $('[data-paste]', box).addEventListener('change', e => { st.vals[lab] = e.target.value.trim(); acc = null; changed(); draw(); });
+  };
+  const capture = () => {
+    if (!('geolocation' in navigator)) { toast('This phone or browser cannot share location.', true); return; }
+    const b = $('[data-cap]', box); b.disabled = true; b.innerHTML = '<span class="spin"></span> Finding location';
+    navigator.geolocation.getCurrentPosition(pos => {
+      const { latitude, longitude, accuracy } = pos.coords;
+      st.vals[lab] = `https://maps.google.com/?q=${latitude.toFixed(6)},${longitude.toFixed(6)}`;
+      acc = accuracy; changed(); draw(); toast('Location captured');
+    }, err => {
+      draw();
+      toast(err.code === 1 ? 'Location is blocked. Allow location for this app in your phone settings, then try again.'
+        : err.code === 3 ? 'Location took too long. Turn on GPS and try again in the open.' : 'Could not get your location. Turn on GPS and try again.', true);
+    }, { enableHighAccuracy: true, timeout: 25000, maximumAge: 0 });
+  };
+  draw();
+}
+
+function wirePhotos(box, st, changed, root) {
+  const lab = box.dataset.photos;
+  const P = st.photos[lab];
+  const local = {}; // id/tmp -> preview dataURL
+  const tiles = []; // {key, state:'up'|'fail', data}
+  // File pickers live outside the redrawn area, so a finishing upload can't remove them mid-pick
+  const inputs = document.createElement('div');
+  inputs.innerHTML = `<input type="file" accept="image/*" capture="environment" class="hidden" data-cam>
+    <input type="file" accept="image/*" multiple class="hidden" data-pick>`;
+  box.insertAdjacentElement('afterend', inputs);
+  const camInput = $('[data-cam]', inputs), pickInput = $('[data-pick]', inputs);
+  [camInput, pickInput].forEach(i => i.onchange = () => { [...i.files].forEach(add); i.value = ''; });
+  const draw = () => {
+    box.innerHTML = `<div class="photos">
+      ${P.list.map(id => `<div class="ph"><img alt="" data-pid="${esc(id)}" src="${esc(local[id] || photoSrc(id, 300))}"><button type="button" class="x" data-rm="${esc(id)}" aria-label="Remove photo">${icon('x')}</button></div>`).join('')}
+      ${tiles.map(t => `<div class="ph ${t.state === 'fail' ? 'fail' : ''}"><img alt="" src="${t.data}"><div class="state">${t.state === 'fail' ? '<button type="button" data-retry="' + t.key + '" style="all:unset;cursor:pointer">Failed. Tap to retry</button>' : 'Uploading…'}</div></div>`).join('')}
+      <button type="button" class="add-ph" data-take>${icon('camera')}Take photo</button>
+      <button type="button" class="add-ph" data-gal>${icon('image')}From gallery</button>
+    </div>`;
+    $('[data-take]', box).onclick = () => { changed(); openCamera(addData, () => camInput.click()); };
+    $('[data-gal]', box).onclick = () => { changed(); pickInput.click(); };
+    $$('[data-rm]', box).forEach(b => b.onclick = () => {
+      if (!confirm('Remove this photo from the lead?')) return;
+      const id = b.dataset.rm; P.list = P.list.filter(x => x !== id);
+      if (P.added.includes(id)) P.added = P.added.filter(x => x !== id); else P.removed.push(id);
+      changed(); draw();
+    });
+    $$('[data-retry]', box).forEach(b => b.onclick = () => { const t = tiles.find(x => x.key === b.dataset.retry); if (t) upload(t); });
+    $('#fSave', root) && ($('#fSave', root).disabled = st.pending > 0 || st.saving);
+  };
+  const upload = async t => {
+    t.state = 'up'; st.pending++; draw();
+    try {
+      const { id } = await api('uploadPhoto', { data: t.data });
+      local[id] = t.data; photoCache[id] = photoCache[id] || null;
+      tiles.splice(tiles.indexOf(t), 1);
+      P.list.push(id); P.added.push(id); changed();
+    } catch (e) { t.state = 'fail'; toast(e.message, true); }
+    st.pending--; draw();
+  };
+  const addData = data => { const t = { key: 't' + Math.random().toString(36).slice(2), state: 'up', data }; tiles.push(t); upload(t); };
+  const add = async file => {
+    try { addData(await compressFile(file)); }
+    catch { toast('Could not read that photo. Try again.', true); }
+  };
+  draw();
+}
+
+/* ======================= SETTINGS (columns) ======================= */
+function openSettings() {
+  const isAdmin = S.user && S.user.role === 'Admin';
+  const L = openLayer({ head: headBar('Columns and settings'), body: '' });
+  wireClose(L);
+  let openRow = null;
+  const draw = () => {
+    const sections = [...new Set(S.fields.map(f => f.section))];
+    $('.panel-body', L.el).innerHTML = `
+      ${isAdmin ? `<section class="card-box"><h3>Add a new column</h3>
+        <p class="hint" style="margin:0 0 12px">It appears straight away in the form, cards, list, search and Excel export for everyone, and a new column is added to your Google Sheet.</p>
+        <form id="addCol" style="display:grid;gap:12px">
+          <div class="fld"><label class="l" for="nc_l">Column name</label><input class="inp" id="nc_l" required maxlength="60" placeholder="e.g. Site Engineer Name"></div>
+          <div class="fld"><label class="l" for="nc_t">Type</label><select class="inp" id="nc_t">${Object.entries(TYPE_NAMES).map(([k, n]) => `<option value="${k}">${n}</option>`).join('')}</select></div>
+          <div class="fld"><label class="l" for="nc_s">Section</label><input class="inp" id="nc_s" list="secList" placeholder="e.g. Site Engineer" value="Other"><datalist id="secList">${sections.map(s => `<option value="${esc(s)}">`).join('')}</datalist>
+            <div class="hint">Pick an existing section or type a new one.</div></div>
+          <div class="fld hidden" id="nc_ow"><label class="l" for="nc_o">Choices (one per line)</label><textarea class="inp" id="nc_o" rows="4"></textarea></div>
+          <div class="checks"><label><input type="checkbox" id="nc_c"> Show on cards</label><label><input type="checkbox" id="nc_li" checked> Show in list</label><label><input type="checkbox" id="nc_r"> Required</label></div>
+          <button class="btn primary" type="submit">${icon('plus')}Add column</button>
+        </form></section>` : `<p class="banner" style="margin:0 0 12px">Only the admin can add or change columns. Ask Divyesh if you need a new one.</p>`}
+      <section class="card-box"><h3>Your columns</h3>
+        ${isAdmin ? '<p class="hint" style="margin:0 0 6px">Tap a column to change its section, choices or where it shows. Use the arrows to change the order.</p>' : ''}
+        ${sections.map(sec => `<div class="f-group"><h4>${esc(sec)}</h4>${S.fields.filter(f => f.section === sec).map(f => fieldRow(f, isAdmin, openRow === f.label)).join('')}</div>`).join('')}
+      </section>
+      <section class="card-box"><h3>About</h3>
+        <p class="hint" style="margin:0">Logged in as ${esc(S.user?.name || '')} (${esc(S.user?.role || '')}).<br>
+        ${DEMO ? 'Demo mode: not connected to a Google Sheet yet.' : 'Connected to your Google Sheet.'}<br>App version ${APP_VERSION}${DEMO ? '' : ` · Google script version ${esc(S.backendVersion || '…')}`}</p>
+        ${DEMO ? '<button class="btn" style="margin-top:12px" id="resetDemo">Reset demo data</button>' : ''}
+      </section>`;
+    const body = $('.panel-body', L.el);
+    if (isAdmin) {
+      const t = $('#nc_t', body), ow = $('#nc_ow', body);
+      t.onchange = () => ow.classList.toggle('hidden', !hasChoices(t.value));
+      $('#addCol', body).onsubmit = async e => {
+        e.preventDefault();
+        const fd = { label: $('#nc_l', body).value.trim(), type: t.value, section: $('#nc_s', body).value.trim() || 'Other',
+          options: $('#nc_o', body).value.split(/\n|,/).map(s => s.trim()).filter(Boolean),
+          card: $('#nc_c', body).checked, list: $('#nc_li', body).checked, required: $('#nc_r', body).checked };
+        if ((fd.type === 'picklist' || fd.type === 'multiselect') && !fd.options.length) { toast('Add at least one choice for the picklist', true); return; }
+        const b = e.submitter; b.disabled = true; b.innerHTML = '<span class="spin"></span> Adding';
+        try { const r = await api('addField', { field: fd }); S.fields = r.fields; saveCache(); renderList(); toast(`Column "${fd.label}" added`); draw(); }
+        catch (err) { toast(err.message, true); b.disabled = false; b.innerHTML = icon('plus') + 'Add column'; }
+      };
+    }
+    $$('[data-frow]', body).forEach(r => r.onclick = e => { if (!isAdmin || e.target.closest('[data-mv]')) return; openRow = openRow === r.dataset.frow ? null : r.dataset.frow; draw(); });
+    $$('[data-mv]', body).forEach(b => b.onclick = async () => {
+      const labs = S.fields.map(f => f.label); const i = labs.indexOf(b.dataset.lab); const j = i + (+b.dataset.mv);
+      if (j < 0 || j >= labs.length) return;
+      [labs[i], labs[j]] = [labs[j], labs[i]];
+      const byL = Object.fromEntries(S.fields.map(f => [f.label, f]));
+      S.fields = labs.map(l => byL[l]); draw(); renderList();
+      try { const r = await api('reorderFields', { labels: labs }); S.fields = r.fields; saveCache(); } catch (err) { toast(err.message, true); }
+    });
+    $$('form[data-fedit]', body).forEach(fm => fm.onsubmit = async e => {
+      e.preventDefault();
+      const lab = fm.dataset.fedit; const f = field(lab);
+      const patch = { section: $('[name=sec]', fm).value.trim() || 'Other', card: $('[name=card]', fm).checked, list: $('[name=list]', fm).checked, required: $('[name=req]', fm).checked, active: !$('[name=hide]', fm).checked };
+      if (hasChoices(f.type)) patch.options = $('[name=opts]', fm).value.split('\n').map(s => s.trim()).filter(Boolean);
+      const mx = $('[name=multi]', fm); if (mx) patch.type = mx.checked ? 'multiselect' : 'picklist';
+      const b = e.submitter; b.disabled = true;
+      try { const r = await api('updateField', { label: lab, patch }); S.fields = r.fields; saveCache(); renderList(); openRow = null; draw(); toast('Column updated'); }
+      catch (err) { toast(err.message, true); b.disabled = false; }
+    });
+    const rd = $('#resetDemo', body);
+    if (rd) rd.onclick = () => { if (confirm('Reset all demo data on this device?')) { store.del('sl_demo4'); store.del('sl_draft'); refresh(true); closeTop(true); } };
+  };
+  draw();
+}
+function fieldRow(f, isAdmin, open) {
+  const where = [f.card && 'cards', f.list && 'list'].filter(Boolean).join(' and ');
+  return `<div class="f-row ${f.active ? '' : 'off'}">
+    <div class="f-main" data-frow="${esc(f.label)}" ${isAdmin ? 'style="cursor:pointer" role="button" tabindex="0"' : ''}>
+      <div class="nm"><b>${esc(f.label)}</b><small>${esc(TYPE_NAMES[f.type] || f.type)}${f.active ? (where ? `, shows in ${where}` : ', form only') : ', hidden'}${f.required ? ', required' : ''}</small></div>
+      ${isAdmin ? `<button class="icon-btn" data-mv="-1" data-lab="${esc(f.label)}">${icon('up', 'Move up')}</button><button class="icon-btn" data-mv="1" data-lab="${esc(f.label)}">${icon('down', 'Move down')}</button>` : ''}
+    </div>
+    ${open ? `<form class="f-edit" data-fedit="${esc(f.label)}">
+      <div class="fld"><label class="l">Section</label><input class="inp" name="sec" list="secList2" value="${esc(f.section)}"><datalist id="secList2">${[...new Set(S.fields.map(x => x.section))].map(s => `<option value="${esc(s)}">`).join('')}</datalist></div>
+      ${hasChoices(f.type) ? `<div class="fld"><label class="l">Choices (one per line)</label><textarea class="inp" name="opts" rows="5">${esc(f.options.join('\n'))}</textarea></div>` : ''}
+      ${f.type === 'picklist' || f.type === 'multiselect' ? `<div class="checks"><label><input type="checkbox" name="multi" ${f.type === 'multiselect' ? 'checked' : ''}> Allow more than one choice</label></div>` : ''}
+      <div class="checks">
+        <label><input type="checkbox" name="card" ${f.card ? 'checked' : ''}> Show on cards</label>
+        <label><input type="checkbox" name="list" ${f.list ? 'checked' : ''}> Show in list</label>
+        <label><input type="checkbox" name="req" ${f.required ? 'checked' : ''}> Required</label>
+        <label><input type="checkbox" name="hide" ${f.active ? '' : 'checked'}> Hide this column</label>
+      </div>
+      <p class="hint" style="margin:0">Hiding keeps all existing data in the sheet; it just stops showing in the app.</p>
+      <button class="btn primary" type="submit">Save column</button>
+    </form>` : ''}
+  </div>`;
+}
+
+/* ======================= START ======================= */
+(function start() {
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    navigator.serviceWorker.register('sw.js').catch(() => { });
+  }
+  history.replaceState({ layer: 0 }, '');
+  if (!S.auth) { renderLogin(); return; }
+  const c = store.get('sl_cache');
+  if (c && c.fields) {
+    S.user = c.user; S.fields = c.fields; S.leads = c.leads || []; S.loadedAt = c.at || 0; renderMain(); refresh(true);
+    const of = store.get('sl_open_form');
+    if (of && Date.now() - (of.at || 0) < 12 * 3600e3 && (!of.sr || S.leads.some(l => l[K.SR] === of.sr))) setTimeout(() => openForm(of.sr, of), 150);
+    else store.del('sl_open_form');
+  }
+  else { renderMain(); $('#list').innerHTML = '<div class="loading"><span class="spin"></span> Loading leads</div>'; refresh(true); }
+})();
+</script>
+</body>
+</html>
