@@ -314,6 +314,12 @@ fieldset.fs[disabled]{opacity:.75}
 .was{font-size:12px; color:var(--amber); margin:2px 0 4px 10px; font-weight:600}
 .inrow{display:flex; gap:6px; align-items:center}
 .inrow .inp{flex:1; min-width:0}
+.onc{display:inline-flex; align-items:center; gap:6px; flex:none; font-size:12px; font-weight:600; color:var(--muted); cursor:pointer; padding:4px 2px; white-space:nowrap}
+.onc.on{color:var(--green)}
+.sw.sm{width:36px; height:22px}
+.sw.sm::after{width:16px; height:16px}
+.sw.sm:checked::after{transform:translateX(14px)}
+@media (max-width:420px){ .onc{flex-direction:column; gap:2px; font-size:10px} }
 @media (max-width:420px){ .inline .fld{grid-template-columns:minmax(92px, 33%) minmax(0,1fr); column-gap:8px} }
 
 /* Arrange panel */
@@ -468,8 +474,8 @@ textarea.inp{min-height:84px; resize:vertical}
    If config.js has no link, the app runs in DEMO mode (data stays on this device). */
 const API_URL = String((window.SITE_LEADS_CONFIG && window.SITE_LEADS_CONFIG.API_URL) || '').trim();
 
-const APP_VERSION = "1.1.0";
-const BACKEND_VERSION = "1.0.1"; // the Code.gs version this app needs (or newer)
+const APP_VERSION = "1.2.0";
+const BACKEND_VERSION = "1.0.2"; // the Code.gs version this app needs (or newer)
 function verLess(a, b) { // true if version a is older than b; a missing version counts as oldest
   const pa = String(a || '0').split('.').map(Number), pb = String(b).split('.').map(Number);
   for (let i = 0; i < 3; i++) { if ((pa[i] || 0) !== (pb[i] || 0)) return (pa[i] || 0) < (pb[i] || 0); }
@@ -483,7 +489,7 @@ const K = {
   TITLE: 'Owner Name', TITLE_PHONE: 'Owner Number', ADDR: 'Site Address', TYPE: 'Lead Type', STATUS: 'Site Status',
   PROJECT: 'Project', FOLLOW: 'Follow-up Date', DATE: 'Date',
   CTYPE: 'Contractor Type', BUILDER: 'Builder Name', BUILDER_PHONE: 'Builder Number',
-  LSTATUS: 'Lead Status', REASON: 'Not Converted Reason'
+  LSTATUS: 'Lead Status', REASON: 'Not Converted Reason', CARDNAME: 'Card Name'
 };
 /* Lead Status: new leads start as the first option (Open).
    "Not Converted" needs a reason; for other statuses the reason is cleared. */
@@ -493,25 +499,24 @@ const leadStatus = l => l[K.LSTATUS] || statusOptions()[0];
 const isOpen = l => leadStatus(l) === statusOptions()[0];
 function statusClass(v) { v = String(v || '').toLowerCase(); return isNotConv(v) ? 'st-not' : /convert/.test(v) ? 'st-conv' : 'st-open'; }
 const statusBadge = l => `<span class="badge status ${statusClass(leadStatus(l))}">${esc(leadStatus(l))}</span>`;
-/* Which person's name is shown as the card title / Name column.
-   "Auto": Contractor Type With Material → Builder, Without Material → Owner,
-   not chosen → Owner (or Builder if there's no owner). */
+/* Which person's name is shown as the card title and in the list's Name column.
+   Each lead decides with the "On card" toggle next to the names (saved in the
+   "Card Name" column). Leads where nothing is chosen show the Builder. */
 const PEOPLE = {
   owner: ['Owner Name', 'Owner Number', 'Owner'],
   builder: ['Builder Name', 'Builder Number', 'Builder'],
   architect: ['Architect Name', 'Architect Number', 'Architect'],
-  contractor: ['Contractor Name', 'Contractor Number', 'Contractor']
+  contractor: ['Contractor Name', 'Contractor Number', 'Contractor'],
+  electrical: ['Electrical Contractor Name', 'Electrical Contractor Number', 'Electrical Contractor']
 };
-const TITLE_MODES = [['auto', 'Auto'], ['owner', 'Owner'], ['builder', 'Builder'], ['architect', 'Architect'], ['contractor', 'Contractor']];
+const DEFAULT_CARD_PERSON = 'Builder';
+const NAME_ROLE = Object.fromEntries(Object.values(PEOPLE).map(([n, , r]) => [n, r])); // 'Builder Name' → 'Builder'
 function person(l, k) { const [n, p, r] = PEOPLE[k]; return { name: l[n] || '', phone: l[p] || '', role: r, label: n, phoneLabel: p }; }
-function leadTitle(l, mode) {
-  mode = mode || prefs().titleMode || 'auto';
-  if (mode !== 'auto' && PEOPLE[mode]) return person(l, mode);
-  const ct = String(l[K.CTYPE] || '').toLowerCase();
-  const owner = person(l, 'owner'), builder = person(l, 'builder');
-  if (/without/.test(ct)) return owner;
-  if (/with/.test(ct)) return builder;
-  return owner.name || owner.phone || !(builder.name || builder.phone) ? owner : builder;
+function cardRole(v) { const r = String(v || '').trim(); return Object.values(PEOPLE).some(x => x[2] === r) ? r : DEFAULT_CARD_PERSON; }
+function leadTitle(l) {
+  const role = cardRole(l[K.CARDNAME]);
+  const k = Object.keys(PEOPLE).find(k => PEOPLE[k][2] === role);
+  return person(l, k);
 }
 
 /* Personal view settings (column order/width/visibility, card layout, title).
@@ -521,7 +526,7 @@ function prefKey() { return 'sl_prefs_' + String(S.user ? S.user.name : '').toLo
 function prefs() {
   if (!S.prefs) {
     const saved = store.get(prefKey()) || {};
-    S.prefs = { titleMode: saved.titleMode || 'auto', cols: Array.isArray(saved.cols) ? saved.cols : null, card: Object.assign({}, CARD_DEFAULTS, saved.card || {}) };
+    S.prefs = { cols: Array.isArray(saved.cols) ? saved.cols : null, card: Object.assign({}, CARD_DEFAULTS, saved.card || {}) };
   }
   return S.prefs;
 }
@@ -534,7 +539,7 @@ function defaultWidth(k) {
 }
 // The list columns in this person's order; new columns from Settings slot in automatically
 function colsList(P = prefs()) {
-  const all = ['__name', ...F_().map(f => f.label), '__updated', '__by'];
+  const all = ['__name', ...F_().filter(f => f.label !== K.CARDNAME).map(f => f.label), '__updated', '__by'];
   const out = (P.cols || []).filter(c => all.includes(c.key)).map(c => ({ key: c.key, show: c.show !== false, w: Math.max(70, +c.w || defaultWidth(c.key)) }));
   all.forEach((k, i) => {
     if (out.some(o => o.key === k)) return;
@@ -688,6 +693,7 @@ const DEFAULT_FIELDS = [
   ['Architect Name', 'text', 'Architect', '', 1, 1], ['Architect Number', 'phone', 'Architect', '', 1, 1], ['Architect Office Address', 'text', 'Architect', '', 0, 1], ['Architect Details', 'longtext', 'Architect', '', 0, 1],
   ['Contractor Name', 'text', 'Contractor', '', 1, 1], ['Contractor Number', 'phone', 'Contractor', '', 1, 1], ['Contractor Type', 'picklist', 'Contractor', 'With Material, Without Material', 1, 1], ['Contractor Details', 'longtext', 'Contractor', '', 0, 1],
   ['Electrical Contractor Name', 'text', 'Electrical Contractor', '', 1, 1], ['Electrical Contractor Number', 'phone', 'Electrical Contractor', '', 1, 1], ['Electrical Contractor Details', 'longtext', 'Electrical Contractor', '', 0, 1],
+  ['Card Name', 'picklist', 'Lead', 'Owner, Builder, Architect, Contractor, Electrical Contractor', 0, 0],
   ['Project', 'picklist_custom', 'Project', 'G+1, G+2, G+3, G+4, G+5, B+G+3, 2B+G+5', 1, 1],
   ['Site Status', 'picklist', 'Project', 'Excavation, Foundation, Plinth, Structure, Brickwork, Plastering, Finishing, Completed, On Hold', 1, 1],
   ['Current Usage', 'text', 'Project', '', 1, 1], ['Vendor', 'picklist_custom', 'Project', 'Shree Traders, Agrawal Cement Depot', 1, 1],
@@ -696,7 +702,7 @@ const DEFAULT_FIELDS = [
 
 const Demo = {
   db() {
-    let db = store.get('sl_demo4');
+    let db = store.get('sl_demo5');
     if (!db) {
       const now = () => todayISO() + ' 10:30';
       const mk = (sr, o) => Object.assign({ [K.SR]: String(sr), [K.CREATED_AT]: now(), [K.CREATED_BY]: 'Divyesh', [K.UPDATED_AT]: now(), [K.UPDATED_BY]: 'Divyesh', [K.ARCHIVED]: 'No' }, o);
@@ -704,16 +710,16 @@ const Demo = {
         fields: DEFAULT_FIELDS, history: [], photos: {},
         leads: [
           mk(1, { 'Date': todayISO(-12), 'Lead Type': 'Cement, RMC', 'Site Address': 'Plot 14, Shankar Nagar, near Ganesh temple, Raipur', 'Location': 'https://maps.google.com/?q=21.249710,81.660530', 'Owner Name': 'Ramesh Agrawal', 'Owner Number': '98271 45210', 'Builder Name': 'Sai Constructions', 'Builder Number': '93011 22004', 'Architect Name': 'Ar. Neha Jain', 'Architect Number': '98260 33115', 'Contractor Name': 'Mahesh Sahu', 'Contractor Number': '70000 41221', 'Contractor Type': 'With Material', 'Electrical Contractor Name': 'Vikas Electricals', 'Electrical Contractor Number': '93000 55120', 'Builder Details': 'Builds 3–4 residential projects a year in Shankar Nagar. Prefers credit terms.', 'Lead Status': 'Open', 'Project': 'G+3', 'Site Status': 'Structure', 'Current Usage': 'UltraTech, about 300 bags/month', 'Vendor': 'Shree Traders', 'Follow-up Date': todayISO(-2), 'Remark': 'Slab casting for 2nd floor next week. Meet contractor at site.' }),
-          mk(2, { 'Date': todayISO(-5), 'Lead Type': 'Electrical, BPD', 'Site Address': 'Telibandha main road, opposite petrol pump', 'Owner Name': 'Sunita Verma', 'Owner Number': '94252 10087', 'Builder Name': 'Verma Builders', 'Builder Number': '98930 77120', 'Contractor Name': 'Imran Khan', 'Contractor Number': '99070 11223', 'Contractor Type': 'Without Material', 'Lead Status': 'Converted', 'Project': '2B+G+5', 'Site Status': 'Foundation', 'Vendor': 'Agrawal Cement Depot', 'Follow-up Date': todayISO(0), 'Remark': 'Wiring tender expected after plinth.' }),
-          mk(3, { 'Date': todayISO(-1), 'Lead Type': 'Cement', 'Site Address': 'Mowa, behind D-Mart, new colony', 'Owner Name': 'Prakash Dewangan', 'Owner Number': '89895 61022', 'Contractor Name': 'Rajesh Yadav', 'Contractor Number': '96172 30455', 'Contractor Type': 'Without Material', 'Lead Status': 'Not Converted', 'Not Converted Reason': 'Owner already tied up with another dealer for the full project.', 'Project': 'G+1', 'Site Status': 'Excavation', 'Follow-up Date': todayISO(5) })
+          mk(2, { 'Date': todayISO(-5), 'Lead Type': 'Electrical, BPD', 'Site Address': 'Telibandha main road, opposite petrol pump', 'Owner Name': 'Sunita Verma', 'Owner Number': '94252 10087', 'Builder Name': 'Verma Builders', 'Builder Number': '98930 77120', 'Contractor Name': 'Imran Khan', 'Contractor Number': '99070 11223', 'Contractor Type': 'Without Material', 'Card Name': 'Owner', 'Lead Status': 'Converted', 'Project': '2B+G+5', 'Site Status': 'Foundation', 'Vendor': 'Agrawal Cement Depot', 'Follow-up Date': todayISO(0), 'Remark': 'Wiring tender expected after plinth.' }),
+          mk(3, { 'Date': todayISO(-1), 'Lead Type': 'Cement', 'Site Address': 'Mowa, behind D-Mart, new colony', 'Owner Name': 'Prakash Dewangan', 'Owner Number': '89895 61022', 'Contractor Name': 'Rajesh Yadav', 'Contractor Number': '96172 30455', 'Contractor Type': 'Without Material', 'Card Name': 'Owner', 'Lead Status': 'Not Converted', 'Not Converted Reason': 'Owner already tied up with another dealer for the full project.', 'Project': 'G+1', 'Site Status': 'Excavation', 'Follow-up Date': todayISO(5) })
         ]
       };
       db.history = db.leads.map(l => ({ at: l[K.CREATED_AT], sr: l[K.SR], user: 'Divyesh', action: 'Created', field: '', old: '', new: '' }));
-      store.set('sl_demo4', db);
+      store.set('sl_demo5', db);
     }
     return db;
   },
-  save(db) { store.set('sl_demo4', db); },
+  save(db) { store.set('sl_demo5', db); },
   async call(action, p, auth, opts = {}) {
     await new Promise(r => setTimeout(r, 180));
     const db = this.db();
@@ -995,7 +1001,6 @@ function renderMain() {
           <button class="btn small" id="btnArrange">${icon('arrange')}Arrange</button>
         </div>
         <div class="status-bar" id="statusBar" role="group" aria-label="Show leads by status"></div>
-        <div class="title-row"><span class="lbl">Show name of</span><div class="seg small" id="titleSeg" role="group" aria-label="Name shown on cards and list"></div></div>
         <div class="summary" id="summary"></div>
       </div>
       <main class="list-area" id="list"></main>
@@ -1071,7 +1076,6 @@ function renderList() {
   const over = openActive.filter(l => followState(l[K.FOLLOW]) === 'overdue').length;
   const today = openActive.filter(l => followState(l[K.FOLLOW]) === 'today').length;
   renderStatusBar(active);
-  renderTitleSeg();
   $('#summary').innerHTML = `<span class="total">${leads.length} of ${active.length} lead${active.length === 1 ? '' : 's'}</span>
     ${over ? `<button class="chip red" data-f="overdue" aria-pressed="${S.follow === 'overdue'}">${over} overdue</button>` : ''}
     ${today ? `<button class="chip amber" data-f="today" aria-pressed="${S.follow === 'today'}">${today} due today</button>` : ''}
@@ -1125,13 +1129,6 @@ function wireResize(el) {
   });
 }
 function setColWidth(key, w) { const P = prefs(); P.cols = colsList(P).map(c => c.key === key ? Object.assign({}, c, { w }) : c); savePrefs(); }
-// "Show name of" toggle: Auto / Owner / Builder / Architect / Contractor
-function renderTitleSeg() {
-  const seg = $('#titleSeg'); if (!seg) return;
-  const m = prefs().titleMode;
-  seg.innerHTML = TITLE_MODES.map(([k, n]) => `<button data-tm="${k}" aria-pressed="${m === k}" title="${k === 'auto' ? 'With Material: Builder. Without Material: Owner.' : 'Show the ' + n.toLowerCase() + ' name'}">${n}</button>`).join('');
-  $$('[data-tm]', seg).forEach(b => b.onclick = () => { prefs().titleMode = b.dataset.tm; savePrefs(); renderList(); });
-}
 function markPicked() {
   $$('#list [data-sr]').forEach(r => r.classList.toggle('picked', r.dataset.sr === S.picked));
 }
@@ -1180,8 +1177,8 @@ function titleHTML(t) {
 function cardHTML(l, P = prefs()) {
   const C = P.card, fields = F_();
   const sections = [...new Set(fields.map(f => f.section))];
-  const t = leadTitle(l, P.titleMode);
-  const used = new Set([K.ADDR, K.TYPE, K.STATUS, K.PROJECT, K.FOLLOW, K.LSTATUS, K.REASON, K.CTYPE, 'Vendor', t.label, t.phoneLabel, C.sub]);
+  const t = leadTitle(l);
+  const used = new Set([K.ADDR, K.TYPE, K.STATUS, K.PROJECT, K.FOLLOW, K.LSTATUS, K.REASON, K.CTYPE, K.CARDNAME, 'Vendor', t.label, t.phoneLabel, C.sub]);
   const titleSec = (field(t.label) || {}).section;
   const contacts = [];
   for (const sec of sections) {
@@ -1342,7 +1339,7 @@ function exportCSV() {
 /* ======================= FILTERS ======================= */
 function openFilters() {
   // Lead Status has its own buttons at the top of the list
-  const pick = F_().filter(f => f.label !== K.LSTATUS && (f.type === 'picklist' || f.type === 'picklist_custom' || f.type === 'multiselect'));
+  const pick = F_().filter(f => f.label !== K.LSTATUS && f.label !== K.CARDNAME && (f.type === 'picklist' || f.type === 'picklist_custom' || f.type === 'multiselect'));
   const valuesFor = f => {
     const present = new Set(f.type === 'multiselect'
       ? S.leads.flatMap(l => multi(l[f.label]).length ? multi(l[f.label]) : ['(blank)'])
@@ -1413,7 +1410,7 @@ function openForm(sr, resume) {
   const isNew = !sr;
   if (!isNew && !S.leads.some(l => l[K.SR] === String(sr))) return;
   const fields = F_();
-  const sections = [...new Set(fields.map(f => f.section))];
+  const sections = [...new Set(fields.filter(f => f.label !== K.CARDNAME).map(f => f.section))];
   let st, orig, initial, draftRestored, tab = 'details';
 
   const changedLabels = () => fields.filter(f => f.type !== 'photos' && (st.vals[f.label] || '') !== (initial[f.label] || '')).map(f => f.label);
@@ -1488,7 +1485,7 @@ function openForm(sr, resume) {
         ${sections.map(sec => `
           <section class="sec" data-sec="${esc(sec)}">
             <button class="sec-h" type="button" aria-expanded="true"><h3>${esc(sec)}</h3><span class="filled"></span><span class="chev">${icon('chev')}</span></button>
-            <div class="sec-b">${fields.filter(f => f.section === sec).map(f => fieldHTML(f, st, !isNew)).join('')}</div>
+            <div class="sec-b">${fields.filter(f => f.section === sec && f.label !== K.CARDNAME).map(f => fieldHTML(f, st, !isNew)).join('')}</div>
           </section>`).join('')}
         </fieldset>
         ${isNew ? '' : `<p class="meta">Added by ${esc(orig[K.CREATED_BY] || '—')} on ${esc(fmtStamp(orig[K.CREATED_AT]))}<br>Last changed by ${esc(orig[K.UPDATED_BY] || '—')} on ${esc(fmtStamp(orig[K.UPDATED_AT]))}</p>
@@ -1555,7 +1552,7 @@ function openForm(sr, resume) {
       if (show) { const t = $('textarea', box); grow(t); if (focus) setTimeout(() => t.focus(), 50); }
     }
     const secCount = () => $$('.sec', root).forEach(s => {
-      const fs = fields.filter(f => f.section === s.dataset.sec);
+      const fs = fields.filter(f => f.section === s.dataset.sec && f.label !== K.CARDNAME);
       const n = fs.filter(f => f.type === 'photos' ? st.photos[f.label].list.length : st.vals[f.label]).length;
       $('.filled', s).textContent = `${n} of ${fs.length} filled`;
     });
@@ -1598,6 +1595,13 @@ function openForm(sr, resume) {
       const on = b.getAttribute('aria-pressed') !== 'true';
       b.setAttribute('aria-pressed', on); b.textContent = (on ? '✓ ' : '') + b.dataset.v;
       st.vals[box.dataset.multi] = $$('.opt', box).filter(x => x.getAttribute('aria-pressed') === 'true').map(x => x.dataset.v).join(', ');
+      changed();
+    }));
+    // "On card" toggles: exactly one person's name shows on the card
+    $$('[data-oncard]', root).forEach(sw => sw.addEventListener('change', () => {
+      if (!sw.checked) { sw.checked = true; return; } // one must stay on: pick another name instead
+      st.vals[K.CARDNAME] = sw.dataset.oncard;
+      $$('[data-oncard]', root).forEach(x => { x.checked = x === sw; x.closest('.onc').classList.toggle('on', x === sw); });
       changed();
     }));
     // picklist + add new
@@ -1726,7 +1730,15 @@ function fieldHTML(f, st, existing) {
     }
     case 'gps': return `<div class="fld" ${D}><span class="l" style="display:block;font-weight:600;margin-bottom:6px">${esc(f.label)}</span><div class="gps-box" data-gps="${L}"></div></div>`;
     case 'photos': return `<div class="fld" ${D}><span class="l" style="display:block;font-weight:600;margin-bottom:6px">${esc(f.label)}</span><div data-photos="${L}"></div></div>`;
-    default: return `<div class="fld" ${D}>${lab}<input class="inp" id="${id}" data-in="${L}" value="${esc(v)}" autocomplete="off" placeholder="${ph}"></div>`;
+    default: {
+      const role = NAME_ROLE[f.label];
+      if (role && field(K.CARDNAME)) {
+        const on = cardRole(st.vals[K.CARDNAME]) === role;
+        return `<div class="fld" ${D}>${lab}<div class="inrow"><input class="inp" id="${id}" data-in="${L}" value="${esc(v)}" autocomplete="off" placeholder="${ph}">
+          <label class="onc ${on ? 'on' : ''}" title="Show this name on the card"><input type="checkbox" class="sw sm" data-oncard="${esc(role)}" ${on ? 'checked' : ''}><span>On card</span></label></div></div>`;
+      }
+      return `<div class="fld" ${D}>${lab}<input class="inp" id="${id}" data-in="${L}" value="${esc(v)}" autocomplete="off" placeholder="${ph}"></div>`;
+    }
   }
 }
 
@@ -1852,8 +1864,7 @@ function openArrange(startTab = 'cols') {
         <div class="lay">
           <div>
             <h4 style="margin-top:0">Name shown big on the card</h4>
-            <div class="opts" id="tmOpts">${TITLE_MODES.map(([k, n]) => `<button type="button" class="opt" data-tm="${k}" aria-pressed="${P.titleMode === k}">${n}</button>`).join('')}</div>
-            <p class="hint">Auto: With Material shows the Builder, Without Material shows the Owner. You can also switch this from the main screen.</p>
+            <p class="hint" style="margin-top:0">Chosen inside each lead with the <b>On card</b> switch next to the Owner, Builder, Architect, Contractor or Electrical Contractor name. If nothing is chosen, the Builder is shown.</p>
             <h4>Line under the name</h4>
             <select class="inp" id="subSel"><option value="">Nothing</option>${textFields().map(f => `<option ${C.sub === f.label ? 'selected' : ''}>${esc(f.label)}</option>`).join('')}</select>
             <h4>Labels on the top row</h4>
@@ -1872,7 +1883,6 @@ function openArrange(startTab = 'cols') {
     wireDrag();
     // card layout
     const pv = () => { const l = sample(); if (l) $('#pv', body).innerHTML = cardHTML(l, P); };
-    $$('[data-tm]', body).forEach(b => b.onclick = () => { P.titleMode = b.dataset.tm; $$('[data-tm]', body).forEach(x => x.setAttribute('aria-pressed', x === b)); pv(); });
     const ss = $('#subSel', body); if (ss) ss.onchange = () => { P.card.sub = ss.value; pv(); };
     $$('[data-c]', body).forEach(i => i.onchange = () => { P.card[i.dataset.c] = i.checked; pv(); });
     $$('#pv a', body).forEach(a => a.addEventListener('click', e => e.preventDefault()));
@@ -1914,7 +1924,7 @@ function openArrange(startTab = 'cols') {
   }
   $('[data-reset]', L.el).onclick = () => {
     if (tab === 'cols') { P.cols = null; cols = colsList(P); }
-    else { P.card = Object.assign({}, CARD_DEFAULTS); P.titleMode = 'auto'; }
+    else { P.card = Object.assign({}, CARD_DEFAULTS); }
     draw();
   };
   $('[data-save]', L.el).onclick = () => {
@@ -1947,7 +1957,7 @@ function openSettings() {
         </form></section>` : `<p class="banner" style="margin:0 0 12px">Only the admin can add or change columns. Ask Divyesh if you need a new one.</p>`}
       <section class="card-box"><h3>Your columns</h3>
         ${isAdmin ? '<p class="hint" style="margin:0 0 6px">Tap a column to change its section, choices or where it shows. Use the arrows to change the order.</p>' : ''}
-        ${sections.map(sec => `<div class="f-group"><h4>${esc(sec)}</h4>${S.fields.filter(f => f.section === sec).map(f => fieldRow(f, isAdmin, openRow === f.label)).join('')}</div>`).join('')}
+        ${sections.map(sec => `<div class="f-group"><h4>${esc(sec)}</h4>${S.fields.filter(f => f.section === sec && f.label !== K.CARDNAME).map(f => fieldRow(f, isAdmin, openRow === f.label)).join('')}</div>`).join('')}
       </section>
       <section class="card-box"><h3>About</h3>
         <p class="hint" style="margin:0">Logged in as ${esc(S.user?.name || '')} (${esc(S.user?.role || '')}).<br>
@@ -1989,7 +1999,7 @@ function openSettings() {
       catch (err) { toast(err.message, true); b.disabled = false; }
     });
     const rd = $('#resetDemo', body);
-    if (rd) rd.onclick = () => { if (confirm('Reset all demo data on this device?')) { store.del('sl_demo4'); store.del('sl_draft'); refresh(true); closeTop(true); } };
+    if (rd) rd.onclick = () => { if (confirm('Reset all demo data on this device?')) { store.del('sl_demo5'); store.del('sl_draft'); refresh(true); closeTop(true); } };
   };
   draw();
 }
