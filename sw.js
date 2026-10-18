@@ -5,7 +5,7 @@
 // changed link in config.js) is used the NEXT time the app is opened.
 //
 // When you change the app, bump the version below so phones pick up the new files.
-const CACHE = 'site-leads-v1.1.0';
+const CACHE = 'site-leads-v1.3.0';
 const FONTS = 'site-leads-fonts';
 const SHELL = ['./', './index.html', './config.js', './manifest.json', './icons/icon-192.png', './icons/icon-512.png'];
 
