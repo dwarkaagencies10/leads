@@ -93,6 +93,20 @@ svg.i{width:20px; height:20px; flex:none; fill:none; stroke:currentColor; stroke
 .status-dot{width:8px; height:8px; border-radius:50%; background:#4FBF73; display:inline-block; margin-right:6px}
 .status-dot.off{background:#E5A33A}
 
+/* ======================= LEAD TABS (Cement · RMC · BPD | Electrical) ======================= */
+.ltabs{display:flex; max-width:1400px; margin:0 auto; padding:10px 16px 0; gap:6px; border-bottom:1px solid var(--line)}
+.ltabs button{flex:1 1 0; min-width:0; display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:46px; padding:0 10px; border:0; border-bottom:4px solid transparent; margin-bottom:-1px; background:transparent; font-family:var(--font-cond); font-size:18px; font-weight:700; color:var(--muted); cursor:pointer; white-space:nowrap}
+.ltabs button .nm{overflow:hidden; text-overflow:ellipsis}
+.ltabs button .n{font-family:var(--font); font-variant-numeric:tabular-nums; font-size:13px; min-width:24px; height:22px; border-radius:11px; display:inline-grid; place-items:center; padding:0 7px; background:var(--surface-2); color:var(--muted); flex:none}
+.ltabs button[aria-selected="true"]{color:var(--ink); border-color:var(--cement)}
+.ltabs button[aria-selected="true"] .n{background:var(--cement-bg); color:var(--cement)}
+.ltabs button.elec[aria-selected="true"]{border-color:var(--elec)}
+.ltabs button.elec[aria-selected="true"] .n{background:var(--elec-bg); color:var(--elec)}
+.ltabs button:focus-visible{outline:2px solid var(--blue); outline-offset:-2px}
+@media (min-width:900px){ .ltabs button{flex:0 0 auto; padding:0 22px} }
+@media (max-width:520px){ .ltabs{gap:2px; padding:8px 10px 0} .ltabs button{flex:1 1 auto; font-size:17px; gap:6px; padding:0 6px} .ltabs button .n{min-width:22px; padding:0 6px} }
+@media (max-width:370px){ .ltabs button{font-size:15px; gap:4px; padding:0 4px} .ltabs button .n{font-size:12px; height:20px; min-width:20px; padding:0 5px} }
+
 /* ======================= TOOLBAR ======================= */
 .toolbar{padding:12px 16px 4px; display:grid; gap:10px; max-width:1400px; margin:0 auto}
 .search{position:relative}
@@ -474,7 +488,7 @@ textarea.inp{min-height:84px; resize:vertical}
    If config.js has no link, the app runs in DEMO mode (data stays on this device). */
 const API_URL = String((window.SITE_LEADS_CONFIG && window.SITE_LEADS_CONFIG.API_URL) || '').trim();
 
-const APP_VERSION = "1.2.0";
+const APP_VERSION = "1.3.0";
 const BACKEND_VERSION = "1.0.2"; // the Code.gs version this app needs (or newer)
 function verLess(a, b) { // true if version a is older than b; a missing version counts as oldest
   const pa = String(a || '0').split('.').map(Number), pb = String(b).split('.').map(Number);
@@ -659,11 +673,25 @@ const S = {
   view: store.get('sl_view') || (innerWidth >= 900 ? 'list' : 'cards'), limit: 60,
   q: '', sortKey: store.get('sl_sort') || 'new', sort: null,
   filters: (() => { const st = store.get('sl_status'); return st && st.length ? { 'Lead Status': new Set(st) } : {}; })(),
-  follow: 'all', showArchived: false
+  follow: 'all', showArchived: false,
+  tab: store.get('sl_tab') === 'elec' ? 'elec' : 'civil'
 };
 S.sort = SORTS[S.sortKey] || SORTS.new;
 const F_ = () => S.fields.filter(f => f.active);
 const field = label => S.fields.find(f => f.label === label);
+
+/* Two tabs on top: "Cement · RMC · BPD" and "Electrical". Both read the same Leads sheet.
+   A lead goes to the Electrical tab when its Lead Type includes Electrical, and to the
+   first tab when it has Cement, RMC or BPD (or no type yet). A lead with both is in both.
+   The Electrical Contractor columns belong to the Electrical tab. */
+const ELEC = 'Electrical', EC_SEC = 'Electrical Contractor';
+function tabsOn() { const f = field(K.TYPE); return !!(f && f.active && f.options.includes(ELEC)); }
+const hasElec = l => multi(l[K.TYPE]).includes(ELEC);
+const hasCivil = l => { const t = multi(l[K.TYPE]); return !t.length || t.some(x => x !== ELEC); };
+function inTab(l, tab = S.tab) { return !tabsOn() || (tab === 'elec' ? hasElec(l) : hasCivil(l)); }
+// Electrical Contractor columns are hidden in the first tab
+function hiddenHere(label) { const f = field(label); return !!(f && f.section === EC_SEC && tabsOn() && S.tab !== 'elec'); }
+function civilTabName() { const f = field(K.TYPE); return f ? f.options.filter(o => o !== ELEC).join(' · ') || 'Leads' : 'Leads'; }
 
 /* ======================= API ======================= */
 async function api(action, payload = {}, opts = {}) {
@@ -986,6 +1014,7 @@ function renderMain() {
       </header>
       ${DEMO ? '<div class="banner">Demo mode: data stays on this device until config.js has your Google script link (see SETUP.md).</div>' : ''}
       <div class="banner hidden" id="oldBackend"></div>
+      <nav class="ltabs hidden" id="leadTabs" role="tablist" aria-label="Lead groups"></nav>
       <div class="toolbar">
         <div class="search">${icon('search')}<label class="sr-only" for="q">Search leads</label>
           <input id="q" type="search" placeholder="Search name, phone, address, vendor…" autocomplete="off">
@@ -1027,10 +1056,25 @@ function renderMain() {
   renderList();
 }
 
+function renderTabs(active) {
+  const bar = $('#leadTabs'); if (!bar) return;
+  const on = tabsOn();
+  bar.classList.toggle('hidden', !on);
+  if (!on) return;
+  const n = t => active.filter(l => inTab(l, t)).length;
+  bar.innerHTML = `<button role="tab" data-tab="civil" aria-selected="${S.tab === 'civil'}"><span class="nm">${esc(civilTabName())}</span><span class="n">${n('civil')}</span></button>
+    <button role="tab" class="elec" data-tab="elec" aria-selected="${S.tab === 'elec'}"><span class="nm">Electrical</span><span class="n">${n('elec')}</span></button>`;
+  $$('[data-tab]', bar).forEach(b => b.onclick = () => {
+    if (S.tab === b.dataset.tab) return;
+    S.tab = b.dataset.tab; store.set('sl_tab', S.tab); S.limit = 0;
+    $('#list').scrollTop = 0; renderList(); window.scrollTo(0, 0);
+  });
+}
 function searchText(l) { return Object.values(l).join(' ').toLowerCase() + ' ' + digits(Object.values(l).join(' ')); }
 function visibleLeads() {
   const words = S.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
   const out = S.leads.filter(l => {
+    if (!inTab(l)) return false;
     if (!S.showArchived && l[K.ARCHIVED] === 'Yes') return false;
     for (const [lab, set] of Object.entries(S.filters)) {
       if (!set.size) continue;
@@ -1071,7 +1115,9 @@ function renderList() {
   $('#fCount').textContent = nF; $('#fCount').classList.toggle('hidden', !nF);
 
   const leads = visibleLeads();
-  const active = S.leads.filter(l => l[K.ARCHIVED] !== 'Yes');
+  const allActive = S.leads.filter(l => l[K.ARCHIVED] !== 'Yes');
+  renderTabs(allActive);
+  const active = allActive.filter(l => inTab(l));
   const openActive = active.filter(isOpen);
   const over = openActive.filter(l => followState(l[K.FOLLOW]) === 'overdue').length;
   const today = openActive.filter(l => followState(l[K.FOLLOW]) === 'today').length;
@@ -1086,6 +1132,12 @@ function renderList() {
   const el = $('#list');
   if (!S.leads.length) {
     el.innerHTML = `<div class="empty"><h2>No leads yet</h2><p>Tap “Add lead” when you visit your first site.</p></div>`; return;
+  }
+  if (tabsOn() && !S.leads.some(l => inTab(l) && (S.showArchived || l[K.ARCHIVED] !== 'Yes'))) {
+    el.innerHTML = S.tab === 'elec'
+      ? `<div class="empty"><h2>No electrical leads yet</h2><p>Leads with Lead Type <b>Electrical</b> show here. Tap “Add lead” to add one.</p></div>`
+      : `<div class="empty"><h2>No ${esc(civilTabName())} leads yet</h2><p>Leads with Lead Type ${esc(civilTabName().split(' · ').join(', '))} show here.</p></div>`;
+    return;
   }
   if (!leads.length) {
     el.innerHTML = `<div class="empty"><h2>No matching leads</h2><p>Try a different search or clear the filters.</p><button class="btn" id="clr2">Clear search and filters</button></div>`;
@@ -1175,7 +1227,7 @@ function titleHTML(t) {
 }
 // P = personal layout (this person's saved one; the Arrange screen passes a draft for its preview)
 function cardHTML(l, P = prefs()) {
-  const C = P.card, fields = F_();
+  const C = P.card, fields = F_().filter(f => !hiddenHere(f.label));
   const sections = [...new Set(fields.map(f => f.section))];
   const t = leadTitle(l);
   const used = new Set([K.ADDR, K.TYPE, K.STATUS, K.PROJECT, K.FOLLOW, K.LSTATUS, K.REASON, K.CTYPE, K.CARDNAME, 'Vendor', t.label, t.phoneLabel, C.sub]);
@@ -1245,7 +1297,7 @@ function cellHTML(key, l) {
 }
 const sortKeyOf = k => k === '__name' ? '__title' : k === '__updated' ? K.UPDATED_AT : k === '__by' ? K.UPDATED_BY : k;
 function tableHTML(leads, more = '') {
-  const cols = colsList().filter(c => c.show);
+  const cols = colsList().filter(c => c.show && !hiddenHere(c.key));
   const total = 64 + cols.reduce((n, c) => n + c.w, 0);
   const stick2 = cols[0] && cols[0].key === '__name';
   const arrow = sk => S.sort.key === sk ? `<span class="arrow">${S.sort.dir > 0 ? '▲' : '▼'}</span>` : '';
@@ -1330,7 +1382,7 @@ function exportCSV() {
   const csv = '﻿' + [cols.map(c => cell('', c)).join(','), ...leads.map(l => cols.map(c => cell(c, l[c])).join(','))].join('\r\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-  a.download = `site-leads-${todayISO()}.csv`;
+  a.download = `site-leads-${tabsOn() ? (S.tab === 'elec' ? 'electrical-' : 'cement-rmc-bpd-') : ''}${todayISO()}.csv`;
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 4000);
   toast(`Exported ${leads.length} lead${leads.length === 1 ? '' : 's'}`);
@@ -1419,7 +1471,7 @@ function openForm(sr, resume) {
 
   const L = openLayer({
     cls: 'drawer lead', head: '<div data-head></div>', body: '', foot: '<div data-foot></div>',
-    onClose: () => { store.del('sl_open_form'); S.picked = null; markPicked(); },
+    onClose: () => { store.del('sl_open_form'); if (isNew && st && !dirty()) store.del('sl_draft'); S.picked = null; markPicked(); },
     beforeClose: () => {
       if (!dirty() || st.saving) return true;
       return confirm(isNew ? 'Close this form? Your entries are kept as an unfinished lead on this phone, so you can continue later.' : 'Close without saving? Your changes to this lead will be lost.');
@@ -1438,6 +1490,7 @@ function openForm(sr, resume) {
       if (f.type === 'photos') st.photos[f.label] = { list: photoIds(orig[f.label]), added: [], removed: [] };
     });
     if (isNew) { const df = field(K.DATE); if (df && df.active) st.vals[K.DATE] = todayISO(); }
+    if (isNew && tabsOn() && S.tab === 'elec' && field(K.TYPE).active) st.vals[K.TYPE] = ELEC;
     // Lead Status always has a value: new (and old blank) leads start as Open
     if (field(K.LSTATUS) && field(K.LSTATUS).active && !st.vals[K.LSTATUS]) st.vals[K.LSTATUS] = statusOptions()[0];
     initial = Object.assign({}, st.vals);
@@ -1448,7 +1501,8 @@ function openForm(sr, resume) {
       draftRestored = dirty() ? 'reload' : false;
     } else if (isNew) {
       const dr = store.get('sl_draft');
-      if (dr && (Object.values(dr.vals || {}).some(Boolean) || Object.values(dr.photos || {}).some(p => p.added.length))) {
+      const typed = dr && Object.entries(dr.vals || {}).some(([k, v]) => v && v !== initial[k] && k !== K.DATE && k !== K.LSTATUS && k !== K.TYPE);
+      if (dr && (typed || Object.values(dr.photos || {}).some(p => p.added.length))) {
         Object.assign(st.vals, dr.vals); for (const k in dr.photos) if (st.photos[k]) st.photos[k] = dr.photos[k];
         draftRestored = true;
       }
@@ -1556,6 +1610,16 @@ function openForm(sr, resume) {
       const n = fs.filter(f => f.type === 'photos' ? st.photos[f.label].list.length : st.vals[f.label]).length;
       $('.filled', s).textContent = `${n} of ${fs.length} filled`;
     });
+    function toggleElec() {
+      const sec = $(`.sec[data-sec="${CSS.escape(EC_SEC)}"]`, root); if (!sec || !tabsOn()) return;
+      const show = multi(st.vals[K.TYPE]).includes(ELEC);
+      sec.classList.toggle('hidden', !show);
+      // the card can't keep showing a person whose section is hidden: go back to the Builder
+      if (!show && cardRole(st.vals[K.CARDNAME]) === EC_SEC) {
+        st.vals[K.CARDNAME] = initial[K.CARDNAME] === EC_SEC ? '' : (initial[K.CARDNAME] || '');
+        $$('[data-oncard]', root).forEach(x => { const on = x.dataset.oncard === cardRole(st.vals[K.CARDNAME]); x.checked = on; x.closest('.onc').classList.toggle('on', on); });
+      }
+    }
     const changed = () => { saveDraft(); secCount(); markChanges(); updateFoot(); };
     st.onPending = updateFoot;
 
@@ -1595,6 +1659,7 @@ function openForm(sr, resume) {
       const on = b.getAttribute('aria-pressed') !== 'true';
       b.setAttribute('aria-pressed', on); b.textContent = (on ? '✓ ' : '') + b.dataset.v;
       st.vals[box.dataset.multi] = $$('.opt', box).filter(x => x.getAttribute('aria-pressed') === 'true').map(x => x.dataset.v).join(', ');
+      if (box.dataset.multi === K.TYPE) toggleElec();
       changed();
     }));
     // "On card" toggles: exactly one person's name shows on the card
@@ -1686,7 +1751,7 @@ function openForm(sr, resume) {
       }
     };
 
-    toggleReason(false);
+    toggleReason(false); toggleElec();
     secCount(); markChanges(); updateFoot(); saveDraft();
   }
 
@@ -1850,7 +1915,7 @@ function openArrange(startTab = 'cols') {
         <button role="tab" data-t="card" aria-selected="${tab === 'card'}">Card layout</button>
       </div>
       <div class="pane" ${tab === 'cols' ? '' : 'hidden'}>
-        <p class="hint" style="margin:0 0 10px">Drag ${icon('grip')} to change the order. Switch off to hide a column from the list. To change a column's width, drag the edge of its title in the list.</p>
+        <p class="hint" style="margin:0 0 10px">Drag ${icon('grip')} to change the order. Switch off to hide a column from the list. To change a column's width, drag the edge of its title in the list.${tabsOn() ? ' Electrical Contractor columns show only in the Electrical tab.' : ''}</p>
         <div class="arows" id="arows">
           <div class="arow fixed"><span class="hdl" aria-hidden="true" style="opacity:.3">${icon('grip')}</span><span class="nm">Sr. No.<small>Always first</small></span></div>
           ${cols.map((c, i) => `<div class="arow" data-k="${esc(c.key)}">
